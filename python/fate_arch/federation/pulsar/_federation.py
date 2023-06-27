@@ -106,7 +106,7 @@ class Federation(FederationBase):
                 tenant=tenant, admins=[], clusters=[cluster])
 
         route_table_path = pulsar_config.get("route_table")
-        if route_table_path is None:
+        if route_table_path is None:  # 如果没有指定 route_table_path，则使用conf/pulsar_route_table.yaml
             route_table_path = "conf/pulsar_route_table.yaml"
         route_table = file_utils.load_yaml_conf(conf_path=route_table_path)
         mq = MQ(host, port, route_table)
