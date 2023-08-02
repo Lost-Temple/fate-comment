@@ -40,9 +40,9 @@ class Anonymous(object):
 
     def migrate_anonymous(self, anonymous_header):
         ret_list = True
-        if not isinstance(anonymous_header, list):
+        if not isinstance(anonymous_header, list):  # 判断一下anonymous_header是否为列表
             ret_list = False
-            anonymous_header = [anonymous_header]
+            anonymous_header = [anonymous_header]  # 如果不是列表，那就把它放到列表中把它变成一个列表
 
         migrate_anonymous_header = []
         for column in anonymous_header:
