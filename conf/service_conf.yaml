@@ -52,6 +52,8 @@ fateflow:
   # support default/http/grpc
   protocol: default
 database:
+  # 这个是fate_flow的数据库, 跟环境变量FORCE_USE_MYSQL相关, 如果是单机模式，且此环境变量为0或未设置这个环境变量，则使用sqlite数据库
+  # 否则使用mysql数据库，下面就是mysql数据库的连接配置信息
   name: fate_flow
   user: fate
   passwd: fate

@@ -103,9 +103,9 @@ def dump_json_conf(config_data, conf_path):
 
 
 def load_json_conf_real_time(conf_path):
-    if os.path.isabs(conf_path): # 如果是绝对路径，则直接使用这个路径
+    if os.path.isabs(conf_path):  # 如果是绝对路径，则直接使用这个路径
         json_conf_path = conf_path
-    else: # 如果是相对路径，前面需要加上 PROJECT_BASE_DIRECTORY
+    else:  # 如果是相对路径，前面需要加上 PROJECT_BASE_DIRECTORY
         json_conf_path = os.path.join(get_project_base_directory(), conf_path)
     try:
         with open(json_conf_path) as f:
