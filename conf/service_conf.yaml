@@ -1,3 +1,4 @@
+# 如果是true，则会把fateflow服务信息(fateflow的host http_port grpc 等信息)存在zk上，若是false,那么信息就不会存在zk上
 use_registry: false
 use_deserialize_safe_module: false
 dependent_distribution: false
