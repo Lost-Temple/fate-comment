@@ -14,6 +14,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+#  横向联邦学习逻辑回归
 
 from .components import ComponentMeta
 

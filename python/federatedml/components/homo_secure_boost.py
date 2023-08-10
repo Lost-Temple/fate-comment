@@ -14,6 +14,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+#  横向联邦学习的SecureBoost, 以下信息不一定准确：
+#  它是采用同态加密来保证数据的安全，并谳整个过程以符合同态加密的安全。
+#  1.数据对齐：它是一种无损的联邦学习框架，在不泄露数据标识的情况下寻求数据交集。
+#  2.构造Boost树
 
 from .components import ComponentMeta
 
