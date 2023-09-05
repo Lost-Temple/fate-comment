@@ -102,6 +102,7 @@ def date_string_to_timestamp(time_str, format_string="%Y-%m-%d %H:%M:%S"):
     return time_stamp
 
 
+# 序列化方法，先pickle序列化后，再base64
 def serialize_b64(src, to_str=False):
     dest = base64.b64encode(pickle.dumps(src))
     if not to_str:
@@ -110,6 +111,7 @@ def serialize_b64(src, to_str=False):
         return bytes_to_string(dest)
 
 
+# 反序列化, 先base64解码后再pickle反序列化
 def deserialize_b64(src):
     src = base64.b64decode(string_to_bytes(src) if isinstance(src, str) else src)
     if use_deserialize_safe_module:

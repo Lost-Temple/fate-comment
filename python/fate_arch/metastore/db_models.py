@@ -118,9 +118,9 @@ class StorageTableMetaModel(DataBaseModel):
     f_extend_sid = BooleanField(default=False)
     f_auto_increasing_sid = BooleanField(default=False)
 
-    f_schema = SerializedField()
+    f_schema = SerializedField()  # 这个字段是序列化后成为字节数据，然后base64编码过后保存到数据库的
     f_count = BigIntegerField(null=True)
-    f_part_of_data = SerializedField()
+    f_part_of_data = SerializedField()  # 这个字段是序列化后成为字节数据，然后base64编码过后保存到数据库的
     f_origin = CharField(max_length=50, default='')
     f_disable = BooleanField(default=False)
     f_description = TextField(default='')
