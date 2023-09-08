@@ -238,8 +238,8 @@ class Session(object):
             if storage_engine == session.engine:
                 return session
 
-        if record:
-            self.save_record(engine_type=EngineType.STORAGE,
+        if record:  # 保存记录到 t_session_record
+            self.save_record(engine_type=EngineType.STORAGE,  # 引擎类型，computing、storage、federation
                              engine_name=storage_engine,
                              engine_session_id=storage_session_id)
 
@@ -342,7 +342,8 @@ class Session(object):
     def save_record(self, engine_type, engine_name, engine_session_id, engine_runtime_conf=None):
         self._logger.info(
             f"try to save session record for manager {self._session_id}, {engine_type} {engine_name}"
-            f" {engine_session_id}")
+            f" {engine_session_id}"
+        )
         session_record = SessionRecord()
         session_record.f_manager_session_id = self._session_id
         session_record.f_engine_type = engine_type

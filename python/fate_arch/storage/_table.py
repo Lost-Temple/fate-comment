@@ -333,6 +333,7 @@ class StorageTableMeta(StorageTableMetaABC):
 
     @classmethod
     def create_address(cls, storage_engine, address_dict):
+        # 这里根据传入的存储引擎类型，返回对应的对址类，比如传入的存储引擎类型为MYSQL，则返回<class 'fate_arch.common.address.MysqlAddress'>
         address_class = Relationship.EngineToAddress.get(storage_engine)
         kwargs = {}
         for k in address_class.__init__.__code__.co_varnames:
