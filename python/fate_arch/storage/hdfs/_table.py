@@ -46,13 +46,14 @@ class StorageTable(StorageTableBase):
             store_type=store_type,
         )
         # tricky way to load libhdfs
-        try:
+        try:  # try 中导入 HadoopFileSystem类,创建HadoopFileSystem对象，如果导入过中出现异常，就抛出异常。
             from pyarrow import HadoopFileSystem
 
             HadoopFileSystem(self.path)
         except Exception as e:
             LOGGER.warning(f"load libhdfs failed: {e}")
-        self._hdfs_client = fs.HadoopFileSystem.from_uri(self.path)
+        # 如果没有异常才会继续执行，根据self.path创建一个hdfs_client
+        self._hdfs_client = fs.HadoopFileSystem.from_uri(self.path)  # 给一个加了self.的变量赋值就相当于给这个类增加了一个成员变量并赋值？
 
     def check_address(self):
         return self._exist()

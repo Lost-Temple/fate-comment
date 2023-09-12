@@ -175,6 +175,7 @@ class HiveAddress(AddressBase):
 
 
 class LinkisHiveAddress(AddressBase):
+    # 参数name 可以理解为hive中的表名
     def __init__(self, host="127.0.0.1", port=9001, username='', database='', name='', run_type='hql',
                  execute_application_name='hive', source={}, params={}, connector_name=None):
         self.host = host

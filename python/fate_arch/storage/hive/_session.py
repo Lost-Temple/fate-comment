@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 import traceback
-
+# 这个需要 pip install impyla (注意名字,是impyla,而不是impala)
 from impala.dbapi import connect
 
 from fate_arch.common.address import HiveAddress
