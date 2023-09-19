@@ -75,7 +75,7 @@ default_engines:
   storage: standalone
 fate_on_standalone:
   standalone:
-    cores_per_node: 20
+    cores_per_node: 16
     nodes: 1
 fate_on_eggroll:
   clustermanager:

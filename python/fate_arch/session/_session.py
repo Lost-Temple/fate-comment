@@ -56,12 +56,12 @@ class Session(object):
         if computing_type is None:
             raise RuntimeError(f"must set default engines on conf/service_conf.yaml")
 
-        self._computing_type = engines.get(EngineType.COMPUTING, None)
-        self._federation_type = engines.get(EngineType.FEDERATION, None)
-        self._storage_engine = engines.get(EngineType.STORAGE, None)
-        self._computing_session: typing.Optional[CSessionABC] = None
-        self._federation_session: typing.Optional[FederationABC] = None
-        self._storage_session: typing.Dict[StorageSessionABC] = {}
+        self._computing_type = engines.get(EngineType.COMPUTING, None)  # 计算引擎是什么
+        self._federation_type = engines.get(EngineType.FEDERATION, None)  # 联邦引擎是什么
+        self._storage_engine = engines.get(EngineType.STORAGE, None)  # 存储引擎是什么
+        self._computing_session: typing.Optional[CSessionABC] = None  # 计算引擎对应的会话
+        self._federation_session: typing.Optional[FederationABC] = None  # 联邦引擎对应的会话
+        self._storage_session: typing.Dict[StorageSessionABC] = {}  # 存储引擎对应的会话
         self._parties_info: typing.Optional[PartiesInfo] = None
         self._all_party_info: typing.List[Party] = []
         self._session_id = str(uuid.uuid1()) if not session_id else session_id

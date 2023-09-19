@@ -23,7 +23,7 @@ class StorageSession(StorageSessionBase):
     def __init__(self, session_id, options=None):
         super(StorageSession, self).__init__(session_id=session_id, engine=StorageEngine.STANDALONE)
         self._options = options if options else {}
-        self._session = Session(session_id=self._session_id)
+        self._session = Session(session_id=self._session_id)  # 这里会创建一个Session对象, 别和StorageSession搞混了
 
     def table(self, address: AddressABC, name, namespace, partitions, store_type=None, options=None, **kwargs):
         if isinstance(address, StandaloneAddress):

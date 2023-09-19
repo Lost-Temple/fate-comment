@@ -56,13 +56,13 @@ class StorageTable(StorageTableBase):
         return count
 
     def _collect(self, **kwargs):
-        if kwargs.get("is_spark"):
+        if kwargs.get("is_spark"):  # 从kwargs 中获取is_spark的值，如果是非零或非null，则走这个分支，这个分支的意义在哪？
             from pyspark.sql import SparkSession
 
             session = SparkSession.builder.enableHiveSupport().getOrCreate()
             data = session.sql(
                 f"select * from {self._address.database}.{self._address.name}"
-            )
+            )  # 这里是有指定存储引擎在哪里？怎么就直接可以查询了？不从linkis_hive查，为什么把这段代码写在这个模块中？
             return data
         else:
             sql = "select * from {}.{}".format(
@@ -128,8 +128,8 @@ class StorageTable(StorageTableBase):
             )
         )
         headers = {
-            "Token-Code": "MLSS",
-            "Token-User": "alexwu",
+            "Token-Code": Token_Code,  # 这里原先硬编码了一个Token-Code， 被我改了
+            "Token-User": Token_User,  # 这里原先硬编码了一个Token-User， 被我改了
             "Content-Type": "application/json",
         }
         execute_response = requests.Session().get(url=execute_url, headers=headers)

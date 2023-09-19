@@ -300,24 +300,24 @@ class Table(object):
             with env.begin(write=True) as txn:
                 return txn.put(k_bytes, v_bytes)
 
-    def put_all(self, kv_list: Iterable):
+    def put_all(self, kv_list: Iterable):  # 往存储引擎中写入数据，一般情况下，数据存储的文件数和分区数是一致的
         txn_map = {}
         is_success = True
         with ExitStack() as s:
             for p in range(self._partitions):
                 env = s.enter_context(self._get_env_for_partition(p, write=True))
-                txn_map[p] = env, env.begin(write=True)
+                txn_map[p] = env, env.begin(write=True)  # 按每个分区启动一个“事务”
             for k, v in kv_list:
                 try:
                     k_bytes, v_bytes = _kv_to_bytes(k=k, v=v)
-                    p = _hash_key_to_partition(k_bytes, self._partitions)
-                    is_success = is_success and txn_map[p][1].put(k_bytes, v_bytes)
+                    p = _hash_key_to_partition(k_bytes, self._partitions)  # 数据进行hash后对应到不同的分区
+                    is_success = is_success and txn_map[p][1].put(k_bytes, v_bytes)  # 写入到对应的分区中
                 except Exception as e:
                     is_success = False
                     LOGGER.exception(f"put_all for k={k} v={v} fail. exception: {e}")
                     break
             for p, (env, txn) in txn_map.items():
-                txn.commit() if is_success else txn.abort()
+                txn.commit() if is_success else txn.abort()  # 提交事务
 
     def get(self, k):
         k_bytes = _k_to_bytes(k=k)
@@ -351,6 +351,7 @@ class Session(object):
     def load(self, name, namespace):
         return _load_table(session=self, name=name, namespace=namespace)
 
+    # 这个create_table 返回的是Table类型对象，而不是 StorageTable 哦。注意区别
     def create_table(self, name, namespace, partitions, need_cleanup, error_if_exist):
         return _create_table(
             session=self,

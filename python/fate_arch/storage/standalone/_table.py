@@ -23,7 +23,7 @@ from fate_arch.storage import StorageTableBase
 class StorageTable(StorageTableBase):
     def __init__(
         self,
-        session: Session,
+        session: Session,  # 注意这个session的数据类型，别和StorageSession 搞混了
         address=None,
         name: str = None,
         namespace: str = None,
