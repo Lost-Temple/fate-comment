@@ -25,7 +25,7 @@ homo_lr_cpn_meta = ComponentMeta("HomoLR")
 def homo_lr_param():
     from federatedml.param.logistic_regression_param import HomoLogisticParam
 
-    return HomoLogisticParam
+    return HomoLogisticParam  # 横向联邦学习逻辑回归参数
 
 
 @homo_lr_cpn_meta.bind_runner.on_guest
