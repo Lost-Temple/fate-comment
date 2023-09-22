@@ -59,7 +59,7 @@ examples/cache/
 
 # user defined config
 # 这个如果多人开发的时候要把它给注忽略上传，因为这个文件是每个人自己本地开发环境使用的配置
-# /conf/local.*.yaml
+/conf/local.*.yaml
 
 # logs
 **/logs/*

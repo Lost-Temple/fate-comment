@@ -25,7 +25,7 @@ permission:
   dataset: false
 fateflow:
   # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
-  host: 192.168.103.2
+  host: 192.168.101.56
   http_port: 9380
   grpc_port: 9360
   # when you have multiple fateflow server on one party,
