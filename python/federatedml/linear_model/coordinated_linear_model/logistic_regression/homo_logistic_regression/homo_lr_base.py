@@ -100,11 +100,12 @@ class HomoLRBase(BaseLogisticRegression):
         return True
 
     def fit(self, data_instances, validate_data=None):
+        # 获取所有分类(标签列表)
         classes = self.one_vs_rest_obj.get_data_classes(data_instances)
 
-        if self.role == consts.ARBITER:
+        if self.role == consts.ARBITER:  # ARBITER为服务端
             self._server_check_data()
-        else:
+        else:  # HOST或GUEST都为客户端
             self._client_check_data(data_instances)
 
         if len(classes) > 2:
