@@ -45,10 +45,10 @@ class CSession(CSessionABC):
             raw_table = self._session.load(address.name, address.namespace)
             if address.storage_type != StandaloneStoreType.ROLLPAIR_IN_MEMORY:  # 默认是StandaloneStoreType.ROLLPAIR_LMDB
                 raw_table = raw_table.save_as(
-                    name=f"{address.name}_{fate_uuid()}",
+                    name=f"{address.name}_{fate_uuid()}",  # 这里的名称会在原名称的基础上增加一个uuid
                     namespace=address.namespace,
                     partition=partitions,
-                    need_cleanup=True,
+                    need_cleanup=True,  # 用完后清理掉这个表？
                 )
             table = Table(raw_table)
             table.schema = schema

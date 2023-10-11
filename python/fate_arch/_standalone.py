@@ -74,6 +74,7 @@ class Table(object):
     def namespace(self):
         return self._namespace
 
+    # 类的析构函数，当对象销毁时，删除数据表
     def __del__(self):
         if self._need_cleanup:
             self.destroy()
@@ -705,7 +706,7 @@ def _create_table(
         namespace=namespace,
         name=name,
         partitions=partitions,
-        need_cleanup=need_cleanup,
+        need_cleanup=need_cleanup,  # 设置了true后，在Table对象销毁时会删除数据表
     )
 
 

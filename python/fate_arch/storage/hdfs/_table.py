@@ -53,7 +53,8 @@ class StorageTable(StorageTableBase):
         except Exception as e:
             LOGGER.warning(f"load libhdfs failed: {e}")
         # 如果没有异常才会继续执行，根据self.path创建一个hdfs_client
-        self._hdfs_client = fs.HadoopFileSystem.from_uri(self.path)  # 给一个加了self.的变量赋值就相当于给这个类增加了一个成员变量并赋值？
+        # 给一个加了self._hdfs_client的变量赋值就相当于给这个类增加了一个成员变量并赋值？
+        self._hdfs_client = fs.HadoopFileSystem.from_uri(self.path)
 
     def check_address(self):
         return self._exist()

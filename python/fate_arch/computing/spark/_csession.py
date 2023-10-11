@@ -35,7 +35,7 @@ class CSession(CSessionABC):
 
     def load(self, address: AddressABC, partitions, schema, **kwargs):
         from fate_arch.common.address import HDFSAddress
-        if isinstance(address, HDFSAddress):
+        if isinstance(address, HDFSAddress):  # 如果是HDFS存储引擎
             table = from_hdfs(
                 paths=f"{address.name_node}/{address.path}",
                 partitions=partitions,
@@ -49,14 +49,14 @@ class CSession(CSessionABC):
             return table
 
         from fate_arch.common.address import PathAddress
-        if isinstance(address, PathAddress):
+        if isinstance(address, PathAddress):  # 如果是PathAddress
             from fate_arch.computing.non_distributed import LocalData
             from fate_arch.computing import ComputingEngine
             return LocalData(address.path, engine=ComputingEngine.SPARK)
 
         from fate_arch.common.address import HiveAddress, LinkisHiveAddress
 
-        if isinstance(address, (HiveAddress, LinkisHiveAddress)):
+        if isinstance(address, (HiveAddress, LinkisHiveAddress)):  # 如果是Hive存储引擎
             table = from_hive(
                 tb_name=address.name,
                 db_name=address.database,
@@ -65,7 +65,7 @@ class CSession(CSessionABC):
             table.schema = schema
             return table
 
-        if isinstance(address, LocalFSAddress):
+        if isinstance(address, LocalFSAddress):  # 如果是LocalFS
             table = from_localfs(
                 paths=address.path, partitions=partitions, in_serialized=kwargs.get(
                     "in_serialized", True), id_delimiter=kwargs.get(
@@ -77,6 +77,7 @@ class CSession(CSessionABC):
             f"address type {type(address)} not supported with spark backend"
         )
 
+    # 把Python的Collectionl转换成RDD
     def parallelize(self, data: Iterable, partition: int, include_key: bool, **kwargs):
         # noinspection PyPackageRequirements
         from pyspark import SparkContext

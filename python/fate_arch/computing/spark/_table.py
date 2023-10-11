@@ -207,6 +207,8 @@ class Table(CTableABC):
         return from_rdd(_union(self._rdd, other._rdd, func))
 
 
+# 该函数首先创建一个SparkContext对象，然后使用它通过PySpark的textFile()方法从HDFS中读取数据来创建RDD。
+# 然后它应用映射函数来反序列化数据（如果数据已序列化）并将其分区为指定数量的分区。最后，它返回一个带有RDD的Table对象。
 def from_hdfs(paths: str, partitions, in_serialized=True, id_delimiter=None):
     # noinspection PyPackageRequirements
     from pyspark import SparkContext
