@@ -223,16 +223,16 @@ class PSI(ModelBase):
         header1 = expect_table.schema['header']
         header2 = actual_table.schema['header']
 
-        if not set(header1) == set(header2):
+        if not set(header1) == set(header2):  # 比对两个表的头是否一致，对两个表求交，要求两个数据集的表头是一致的
             raise ValueError('table header must be the same while computing psi values')
 
         # baseline table should not contain empty columns
-        abnormal_detection.empty_column_detection(expect_table)
+        abnormal_detection.empty_column_detection(expect_table)  # 列空值检测
 
         self.all_feature_list = header1
 
         # make sure no duplicate features
-        self.all_feature_list = self.check_duplicates(self.all_feature_list)
+        self.all_feature_list = self.check_duplicates(self.all_feature_list)  # 检查是否有重复的表头
 
         # kv bi-directional mapping
         self.tag_id_mapping = {v: k for k, v in enumerate(self.all_feature_list)}
