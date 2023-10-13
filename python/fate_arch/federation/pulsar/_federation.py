@@ -75,19 +75,19 @@ class Federation(FederationBase):
         tenant = pulsar_config.get("tenant", DEFAULT_TENANT)
 
         # max_message_size；
-        max_message_size = int(pulsar_config.get("max_message_size", DEFAULT_MESSAGE_MAX_SIZE))
+        max_message_size = int(pulsar_config.get("max_message_size", DEFAULT_MESSAGE_MAX_SIZE))  # 最大消息默认为1M
 
         pulsar_run = runtime_conf.get(
             "job_parameters", {}).get("pulsar_run", {})
         LOGGER.debug(f"pulsar_run: {pulsar_run}")
 
-        max_message_size = int(pulsar_run.get(
-            "max_message_size", max_message_size))
+        max_message_size = int(pulsar_run.get(  # 这个还可以根据通过JOB的runtime_conf中配置 pulsar_run 参数进行动态设置
+            "max_message_size", max_message_size))  # pulsar_run 参数中可以设置 max_message_size
 
         LOGGER.debug(f"set max message size to {max_message_size} Bytes")
 
         # topic ttl could be overwritten by run time config
-        topic_ttl = int(pulsar_run.get("topic_ttl", topic_ttl))
+        topic_ttl = int(pulsar_run.get("topic_ttl", topic_ttl))  # pulsar_run参数中还可以设置 topic_ttl
 
         # pulsar not use user and password so far
         # TODO add credential to connections

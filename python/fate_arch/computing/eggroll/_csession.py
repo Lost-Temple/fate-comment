@@ -36,7 +36,7 @@ class CSession(CSessionABC):
         if "eggroll.rollpair.inmemory_output" not in options:
             options["eggroll.rollpair.inmemory_output"] = True
         self._rp_session = session_init(session_id=session_id, options=options)
-        self._rpc = runtime_init(session=self._rp_session)
+        self._rpc = runtime_init(session=self._rp_session)  # 初始化一个RollPairContext对象
         self._session_id = self._rp_session.get_session_id()
 
     def get_rpc(self):
@@ -66,7 +66,7 @@ class CSession(CSessionABC):
                 )
 
             if options["store_type"] != EggRollStoreType.ROLLPAIR_IN_MEMORY:
-                rp = rp.save_as(
+                rp = rp.save_as(  # 从存储引擎中读取数据集保存到rollpair对象中
                     name=f"{address.name}_{fate_uuid()}",
                     namespace=self.session_id,
                     partition=partitions,
