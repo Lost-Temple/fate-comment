@@ -19,7 +19,7 @@ from .components import ComponentMeta
 
 psi_cpn_meta = ComponentMeta("PSI")
 
-# 这个好像是横向的隐私求交
+# 横向的隐私求交
 
 @psi_cpn_meta.bind_param
 def psi_param():

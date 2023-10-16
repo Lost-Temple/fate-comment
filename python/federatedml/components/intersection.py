@@ -20,7 +20,7 @@ from .components import ComponentMeta
 
 intersection_cpn_meta = ComponentMeta("Intersection")
 
-# 这个好像是纵向的隐私求交
+# 纵向的隐私求交
 @intersection_cpn_meta.bind_param
 def intersection_param():
     from federatedml.param.intersect_param import IntersectParam
