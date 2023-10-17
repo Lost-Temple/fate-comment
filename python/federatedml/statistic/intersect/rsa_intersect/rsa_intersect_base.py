@@ -31,11 +31,11 @@ class RsaIntersect(Intersect):
         # self.intersect_cache_param = intersect_params.intersect_cache_param
         self.rcv_e = None
         self.rcv_n = None
-        self.e = None
-        self.d = None
-        self.n = None
-        self.p = None
-        self.q = None
+        self.e = None  # 1< e < φ(n)，且e与φ(n) 互质 ， φ(n) 为欧拉公式，φ(n) = (p-1)(q-1)
+        self.d = None  # d 为 e对于φ(n) 的模反元素
+        self.n = None  # n 为 p * q
+        self.p = None  # 其中一个质数
+        self.q = None  # 另一个质数，且不等于p
         self.cp = None
         self.cq = None
         # self.r = None

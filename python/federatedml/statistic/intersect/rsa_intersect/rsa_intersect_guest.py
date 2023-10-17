@@ -85,8 +85,8 @@ class RsaIntersectionGuest(RsaIntersect):
     def split_calculation_process(self, data_instances):
         LOGGER.info("RSA intersect using split calculation.")
         # split data
-        sid_hash_odd = data_instances.filter(lambda k, v: k & 1)
-        sid_hash_even = data_instances.filter(lambda k, v: not k & 1)
+        sid_hash_odd = data_instances.filter(lambda k, v: k & 1)  # 奇数组
+        sid_hash_even = data_instances.filter(lambda k, v: not k & 1)  # 偶数组
         # LOGGER.debug(f"sid_hash_odd count: {sid_hash_odd.count()},"
         #              f"odd fraction: {sid_hash_odd.count()/data_instances.count()}")
 
@@ -95,8 +95,8 @@ class RsaIntersectionGuest(RsaIntersect):
         LOGGER.info("Generate guest protocol key!")
 
         # send public key e & n to all host
-        for i, host_party_id in enumerate(self.host_party_id_list):
-            guest_public_key = {"e": self.e[i], "n": self.n[i]}
+        for i, host_party_id in enumerate(self.host_party_id_list):  # 这里支持多个host的情况
+            guest_public_key = {"e": self.e[i], "n": self.n[i]}  # 公钥(n,e)
             self.transfer_variable.guest_pubkey.remote(guest_public_key,
                                                        role=consts.HOST,
                                                        idx=i)
