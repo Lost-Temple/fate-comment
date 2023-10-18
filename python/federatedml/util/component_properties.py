@@ -54,24 +54,24 @@ class DSLConfigError(ValueError):
 
 class ComponentProperties(object):
     def __init__(self):
-        self.need_cv = False
-        self.need_run = False
-        self.need_stepwise = False
-        self.has_model = False
-        self.has_isometric_model = False
-        self.has_train_data = False
-        self.has_eval_data = False
-        self.has_validate_data = False
-        self.has_test_data = False
+        self.need_cv = False  # 表示是否需要运行交叉验证模块
+        self.need_run = False  # 表示是否需要运行该模块
+        self.need_stepwise = False  # 表示是否需要运行逐步回归模块
+        self.has_model = False  #
+        self.has_isometric_model = False  # 是否具有等距模型。等距模型是指在联邦学习中，不同参与方使用的模型具有相同的结构和参数。
+        self.has_train_data = False  # 是否有训练集，训练集用于训练模型
+        self.has_eval_data = False  # 是否有评估集，评估集用于评估模型效果
+        self.has_validate_data = False  # 是否有验证集，验证集用于调整模型的超参数
+        self.has_test_data = False  # 是否有测试集，测试集用于评估模型性能
         self.has_normal_input_data = False
         self.role = None
-        self.host_party_idlist = []
-        self.local_partyid = -1
-        self.guest_partyid = -1
-        self.input_data_count = 0
-        self.input_eval_data_count = 0
+        self.host_party_idlist = []  # host方的 party id 列表
+        self.local_partyid = -1  # 本地 party id
+        self.guest_partyid = -1  # guest 方的party id
+        self.input_data_count = 0  # 输入数据集中的数据量
+        self.input_eval_data_count = 0  # 评估数据集中的数据量
         self.caches = None
-        self.is_warm_start = False
+        self.is_warm_start = False  # 是否使用热启动
         self.has_arbiter = False
 
     def parse_caches(self, caches):

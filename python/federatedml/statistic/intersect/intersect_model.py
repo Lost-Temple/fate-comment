@@ -66,7 +66,7 @@ class IntersectModelBase(ModelBase):
         self.intersect_preprocess_params = params.intersect_preprocess_params
 
     def init_intersect_method(self):
-        if self.model_param.cardinality_only:
+        if self.model_param.cardinality_only:  # 表示是否输出交集计数，如果为True，会和host同步交集计数
             self.intersect_method = self.model_param.cardinality_method
         else:
             self.intersect_method = self.model_param.intersect_method
@@ -75,7 +75,7 @@ class IntersectModelBase(ModelBase):
         self.host_party_id_list = self.component_properties.host_party_idlist
         self.guest_party_id = self.component_properties.guest_partyid
 
-        if self.role not in [consts.HOST, consts.GUEST]:
+        if self.role not in [consts.HOST, consts.GUEST]:  # 角色只能为host或guest
             raise ValueError("role {} is not support".format(self.role))
 
     def get_model_summary(self):
@@ -95,6 +95,7 @@ class IntersectModelBase(ModelBase):
         if self.role == self.model_param.info_owner:
             if data.schema.get('header') is not None:
                 try:
+                    #
                     share_info_col_idx = data.schema.get('header').index(consts.SHARE_INFO_COL_NAME)
 
                     one_data = data.first()
@@ -102,7 +103,7 @@ class IntersectModelBase(ModelBase):
                         share_data = data.join(self.intersect_ids, lambda d, i: [d.features[share_info_col_idx]])
                     else:
                         share_data = data.join(self.intersect_ids, lambda d, i: [d[share_info_col_idx]])
-
+                    # 向指定的参与方发送共享的数据
                     info_share.remote(share_data,
                                       role=party_role,
                                       idx=-1)
@@ -129,31 +130,31 @@ class IntersectModelBase(ModelBase):
     def __sync_join_id(self, data, intersect_data):
         LOGGER.debug(f"data count: {data.count()}")
         LOGGER.debug(f"intersect_data count: {intersect_data.count()}")
-
-        if self.model_param.sample_id_generator == consts.GUEST:
+        # 指定哪个角色的样本ID将被保留
+        if self.model_param.sample_id_generator == consts.GUEST:  # Guest的数据包含样本ID、ID和值
             sync_join_id = self.transfer_variable.join_id_from_guest
-        else:
+        else:  # Host的数据包含样本ID、ID和值
             sync_join_id = self.transfer_variable.join_id_from_host
-        if self.role == self.model_param.sample_id_generator:
-            join_data = data.subtractByKey(intersect_data)
+        if self.role == self.model_param.sample_id_generator:  # 当前角色就是样本ID将被保留的角色
+            join_data = data.subtractByKey(intersect_data)  # 求 data 和 intersect_data 的差集
             # LOGGER.debug(f"join_data count: {join_data.count()}")
-            if self.model_param.new_sample_id:
-                if self.model_param.only_output_key:
-                    join_data = join_data.map(lambda k, v: (fate_uuid(), None))
+            if self.model_param.new_sample_id:  # 表示是否为sample_id_generator(guest or host)生成新的样本ID, 所以会使用fate_uuid()生成
+                if self.model_param.only_output_key:  # 因为这里是仅输出key
+                    join_data = join_data.map(lambda k, v: (fate_uuid(), None))  # 所以这里元组第1个元素为一个uuid，第2个元素为None
                     join_id = join_data
-                else:
-                    join_data = join_data.map(lambda k, v: (fate_uuid(), v))
-                    join_id = join_data.mapValues(lambda v: None)
-                sync_join_id.remote(join_id)
+                else:  # 如果不是仅输出key
+                    join_data = join_data.map(lambda k, v: (fate_uuid(), v))  # 那么这里元组第2个元素为v
+                    join_id = join_data.mapValues(lambda v: None)  # 这里又把join_id中v置为了None，join_data中的v不会发生变化
+                sync_join_id.remote(join_id)  # 使用联邦引擎把对象发送到其它参与方去
 
                 result_data = intersect_data.union(join_data)
-            else:
+            else:  # 不为sample_id_generator生成新的样本ID
                 join_id = join_data.map(lambda k, v: (k, None))
                 result_data = data
                 if self.model_param.only_output_key:
                     result_data = data.mapValues(lambda v: None)
-                sync_join_id.remote(join_id)
-        else:
+                sync_join_id.remote(join_id)  # 使用联邦引擎把对象发送到其它参与方去
+        else:  # 当前角色不是样本ID将被保留的角色
             join_id = sync_join_id.get(idx=0)
             # LOGGER.debug(f"received join_id count: {join_id.count()}")
             join_data = join_id
@@ -210,13 +211,14 @@ class IntersectModelBase(ModelBase):
         if self.component_properties.caches:
             LOGGER.info(f"Cache provided, will enter intersect online process.")
             return self.intersect_online_process(data, self.component_properties.caches)
-        self.init_intersect_method()
+        self.init_intersect_method()  # 初始化求交方法
         if data_overview.check_with_inst_id(data):
             self.use_match_id_process = True
             LOGGER.info(f"use match_id_process")
         self.sync_use_match_id()
 
         if self.use_match_id_process:
+            # 多host时，sample_id_generator必须是guest
             if len(self.host_party_id_list) > 1 and self.model_param.sample_id_generator != consts.GUEST:
                 raise ValueError("While multi-host, sample_id_generator should be guest.")
             if self.intersect_method == consts.RAW:
