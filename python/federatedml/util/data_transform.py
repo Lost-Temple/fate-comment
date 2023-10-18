@@ -222,6 +222,7 @@ class DenseFeatureTransformer(object):
 
         return data_instance
 
+    # 缺失值处理
     def fill_missing_value(self, input_data_features, mode="fit"):
         if self.missing_fill:
             from federatedml.feature.imputer import Imputer
@@ -243,6 +244,7 @@ class DenseFeatureTransformer(object):
 
         return input_data_features
 
+    # 异常值处理
     def replace_outlier_value(self, input_data_features, mode="fit"):
         if self.outlier_replace:
             from federatedml.feature.imputer import Imputer

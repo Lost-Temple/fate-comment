@@ -70,7 +70,7 @@ class ComponentProperties(object):
         self.guest_partyid = -1  # guest 方的party id
         self.input_data_count = 0  # 输入数据集中的数据量
         self.input_eval_data_count = 0  # 评估数据集中的数据量
-        self.caches = None
+        self.caches = None  # 组件的输出可以缓存，当下一个组件需要相同的输出时，它可以从缓存中获取数据而不是重新计算
         self.is_warm_start = False  # 是否使用热启动
         self.has_arbiter = False
 

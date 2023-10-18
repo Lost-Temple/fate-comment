@@ -218,6 +218,7 @@ class ModelBase(object):
         # self.need_run = need_run
         self.component_properties.need_run = need_run
 
+    # 这是执行组件的方法，返回组件的输出
     def run(self, cpn_input, retry: bool = True):
         self.task_version_id = cpn_input.task_version_id
         self.tracker = cpn_input.tracker
@@ -304,7 +305,7 @@ class ModelBase(object):
         )
         LOGGER.debug(f"running_funcs: {running_funcs.todo_func_list}")
         saved_result = []
-        for func, params, save_result, use_previews in running_funcs:
+        for func, params, save_result, use_previews in running_funcs:  # 执行组件中的方法
             # for func, params in zip(todo_func_list, todo_func_params):
             if use_previews:
                 if params:
