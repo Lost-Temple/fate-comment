@@ -414,7 +414,7 @@ class IntersectParam(BaseParam):
         whether to output estimated intersection count(cardinality);
         if sync_cardinality is True, then sync cardinality count with host(s)
     cardinality_method: string
-        specify which intersect method to use for coutning cardinality, default "ecdh";
+        specify which intersect method to use for counting cardinality, default "ecdh";
         note that with "rsa", estimated cardinality will be produced;
         while "dh" and "ecdh" method output exact cardinality, it only supports single-host task
     sync_cardinality: bool
