@@ -16,7 +16,7 @@ pip install -r requirements.txt
 ```shell
 pip install grpcio==1.46.3
 pip install grpcio-tools==1.46.3
-pip install werkzeug
+pip install Werkzeug==2.3.7
 pip install filelock==3.3.1
 pip install cachetools==3.0.0
 pip install ruamel-yaml==0.16.10
