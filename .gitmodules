@@ -5,8 +5,8 @@
 [submodule "eggroll"]
 	path = eggroll
 	url = https://github.com/Lost-Temple/eggroll-comment.git
-	branch = v2.5.1
+	branch = eggroll-comment
 [submodule "fateflow"]
 	path = fateflow
 	url = https://github.com/Lost-Temple/fateflow-comment.git
-	branch = fateflow-dev-maodm
+	branch = fateflow-comment
