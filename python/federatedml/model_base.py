@@ -299,7 +299,7 @@ class ModelBase(object):
         if hasattr(self.model_param, "callback_param"):
             callback_param = getattr(self.model_param, "callback_param")
             self.callback_list.init_callback_list(callback_param)
-
+        # 获取running_funcs，包含：todo_func_list = []、todo_func_params = []、save_result = []、use_previews_result = []
         running_funcs = self.component_properties.extract_running_rules(
             datasets=cpn_input.datasets, models=cpn_input.models, cpn=self
         )

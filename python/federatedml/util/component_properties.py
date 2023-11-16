@@ -57,7 +57,7 @@ class ComponentProperties(object):
         self.need_cv = False  # 表示是否需要运行交叉验证模块
         self.need_run = False  # 表示是否需要运行该模块
         self.need_stepwise = False  # 表示是否需要运行逐步回归模块
-        self.has_model = False  #
+        self.has_model = False  # 这个的作用在于：比如前一个组件的输出model作为当前组件的输入model, 当has_model为true时，会调用load_model 方法
         self.has_isometric_model = False  # 是否具有等距模型。等距模型是指在联邦学习中，不同参与方使用的模型具有相同的结构和参数。
         self.has_train_data = False  # 是否有训练集，训练集用于训练模型
         self.has_eval_data = False  # 是否有评估集，评估集用于评估模型效果
@@ -337,7 +337,7 @@ class ComponentProperties(object):
             return self.warm_start_process(running_funcs, cpn, train_data, validate_data, schema)
 
         running_funcs = self._train_process(running_funcs, cpn, train_data, validate_data, test_data, schema)
-
+        # 这里通过条件判断，在running_funcs中添加不同的组件方法、不同的参数
         if self.has_normal_input_data and not self.has_model:
             running_funcs.add_func(cpn.extract_data, [data], save_result=True)
             running_funcs.add_func(cpn.set_flowid, ['fit'])

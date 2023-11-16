@@ -20,8 +20,8 @@ from pyspark import StorageLevel
 
 # noinspection PyUnresolvedReferences
 def materialize(rdd):
-    rdd.persist(get_storage_level())
-    rdd.count()
+    rdd.persist(get_storage_level())  # 这里会把rdd持久化，并指定了存储级别，但这里并没有真正的做rdd的持久化
+    rdd.count()  # rdd的第一次计算会触发rdd的持久化，这里调用rdd.count()的作用就是为了触发rdd的持久化
     return rdd
 
 

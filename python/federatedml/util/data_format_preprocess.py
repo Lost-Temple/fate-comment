@@ -111,10 +111,11 @@ class DataFormatPreProcess(object):
 
     @staticmethod
     def generate_header(data, schema):
-        if not schema.get('meta'):
+        if not schema.get('meta'):  # schem中必须含有meta
             raise ValueError("Meta not in schema")
 
         meta = schema["meta"]
+        # 初始化一个字典，它内部包含两个键值对： 1 键：original_index_info 值：dict() 2 键：meta 值：meta变量的值
         generated_header = dict(original_index_info=dict(), meta=meta)
         input_format = meta.get("input_format")
         delimiter = meta.get("delimiter", ",")

@@ -214,6 +214,7 @@ def from_hdfs(paths: str, partitions, in_serialized=True, id_delimiter=None):
     from pyspark import SparkContext
 
     sc = SparkContext.getOrCreate()
+    # partition 是python字符串类型的分割方法，返回一个三元组，第0个为分隔符左侧字子串，第1个为分隔符本身，第2个为分隔符右侧子串
     fun = hdfs_utils.deserialize if in_serialized else lambda x: (x.partition(id_delimiter)[0],
                                                                   x.partition(id_delimiter)[2])
     rdd = materialize(
