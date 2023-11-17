@@ -123,12 +123,12 @@ class DataFormatPreProcess(object):
             raise ValueError("InputFormat should be configured.")
 
         if input_format == "dense":
-            if "header" not in schema:
+            if "header" not in schema:  # dense 格式的数据必须包含有header
                 raise ValueError("Dense input data must have schema")
 
             header = schema["header"].strip().split(delimiter, -1)
             header = list(map(lambda col: col.strip(), header))
-            header_index_mapping = dict(zip(header, range(len(header))))
+            header_index_mapping = dict(zip(header, range(len(header))))  # 用字典来保存 header 和 index的映射
             with_label = meta.get("with_label", False)
             if not isinstance(with_label, bool):
                 raise ValueError("with_label should be True or False")

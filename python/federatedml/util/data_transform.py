@@ -120,7 +120,7 @@ class DenseFeatureTransformer(object):
     def extract_feature_value(self, value, header_index=None):
         if not header_index:
             return []
-
+        # split中的参数-1表示不限制分割次数
         value = value.split(self.delimitor, -1)
         if len(value) <= header_index[-1]:
             raise ValueError("Feature shape is smaller than header shape")
@@ -155,8 +155,8 @@ class DenseFeatureTransformer(object):
             schema["meta"] = meta
             generated_header = DataFormatPreProcess.generate_header(input_data, schema)
             schema.update(generated_header)
-            schema = self.anonymous_generator.generate_anonymous_header(schema)
-            set_schema(input_data, schema)
+            schema = self.anonymous_generator.generate_anonymous_header(schema)  # 改为匿名头
+            set_schema(input_data, schema)  # 设置schema
             if self.exclusive_data_type:
                 self._init_exclusive_data_type(self.exclusive_data_type, schema["header"])
         else:
@@ -173,9 +173,11 @@ class DenseFeatureTransformer(object):
                 self.anonymous_header = anonymous_header
         else:
             self.header = header
-            self.anonymous_header = anonymous_header
+            self.anonymous_header = anonymous_header  # 格式如：host_10000_x0 host_10000_x1 ...
 
-        header_index = schema["original_index_info"]["header_index"]
+        header_index = schema["original_index_info"]["header_index"]  # 如：[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        # 这里的作用就相当于创建了一个新的函数extract_feature_func
+        # 这个新的函数就是在extract_feature_value的基础上，把extract_feature_value的参数header_index固定为header_index变量的值
         extract_feature_func = functools.partial(self.extract_feature_value,
                                                  header_index=header_index)
         input_data_features = input_data.mapValues(extract_feature_func)
