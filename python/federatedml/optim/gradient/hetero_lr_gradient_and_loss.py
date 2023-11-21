@@ -201,15 +201,15 @@ class Host(hetero_linear_model_gradient.Host, loss_sync.Host):
         self_wx_square = self.forwards.mapValues(lambda x: np.square(4 * x))
         if not batch_masked:
             self_wx_square = self_wx_square.reduce(reduce_add)
-            en_wx_square = cipher_operator.encrypt(self_wx_square)
+            en_wx_square = cipher_operator.encrypt(self_wx_square)  # 同态加密
         else:
-            en_wx_square = self_wx_square.mapValues(lambda x: cipher_operator.encrypt(x))
+            en_wx_square = self_wx_square.mapValues(lambda x: cipher_operator.encrypt(x))  # lambda函数，同态加密
 
         self.remote_loss_intermediate(en_wx_square, suffix=current_suffix)
 
         loss_regular = optimizer.loss_norm(lr_weights)
         if loss_regular is not None:
-            en_loss_regular = cipher_operator.encrypt(loss_regular)  # 加密
+            en_loss_regular = cipher_operator.encrypt(loss_regular)  # 同态加密
             self.remote_loss_regular(en_loss_regular, suffix=current_suffix)
 
 

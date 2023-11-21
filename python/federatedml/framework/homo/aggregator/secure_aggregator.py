@@ -64,7 +64,7 @@ class SecureAggregatorClient(AggregatorBaseClient):
                 to_agg = model * self._weight
 
             if self.secure_aggregate:
-                to_agg: Weights = to_agg.encrypted(
+                to_agg: Weights = to_agg.encrypted(  # 这里会加密，但用的不是帕耶同态加密
                     self._random_padding_cipher)
             return to_agg
 

@@ -109,12 +109,12 @@ class HeteroLRHost(HeteroLRBase):
                 LOGGER.debug(
                     "iter: {}, batch: {}, before compute gradient, data count: {}".format(
                         self.n_iter_, batch_index, batch_feat_inst.count()))
-                optim_host_gradient = self.gradient_loss_operator.compute_gradient_procedure(  # 计算梯度，会使用加密
+                optim_host_gradient = self.gradient_loss_operator.compute_gradient_procedure(  # 计算梯度，会使用同态加密
                     batch_feat_inst, self.cipher_operator, self.model_weights, self.optimizer, self.n_iter_,
                     batch_index)
                 # LOGGER.debug('optim_host_gradient: {}'.format(optim_host_gradient))
 
-                self.gradient_loss_operator.compute_loss(self.model_weights, self.optimizer,  # 计算损失值，会使用加密
+                self.gradient_loss_operator.compute_loss(self.model_weights, self.optimizer,  # 计算损失值，会使用同态加密
                                                          self.n_iter_, batch_index, self.cipher_operator,
                                                          batch_masked=self.batch_generator.batch_masked)
 
