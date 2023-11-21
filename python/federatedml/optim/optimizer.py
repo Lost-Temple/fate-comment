@@ -32,10 +32,12 @@ class _Optimizer(object):
         self.decay_sqrt = decay_sqrt
         self.mu = mu
 
+    # 这个方法的目的是提供一个能够随着训练步数增加而逐渐减小的学习率，以帮助模型更好地收敛到最优解。
+    # 学习率是在梯度下降等优化算法中用于调整参数的步长。
     def decay_learning_rate(self):
-        if self.decay_sqrt:
+        if self.decay_sqrt:  # 采用平方根作为衰减因子
             lr = self.learning_rate / np.sqrt(1 + self.decay * self.iters)
-        else:
+        else:  # 不采用平方根作为衰减因子
             lr = self.learning_rate / (1 + self.decay * self.iters)
         return lr
 
@@ -50,35 +52,39 @@ class _Optimizer(object):
     def apply_gradients(self, grad):
         raise NotImplementedError("Should not call here")
 
+    # L1正则化
     def _l1_updator(self, model_weights: LinearModelWeights, gradient):
-        coef_ = model_weights.coef_
-        if model_weights.fit_intercept:
+        coef_ = model_weights.coef_  # 模型权重系数
+        if model_weights.fit_intercept:  # 如果包含了截距，那就去除掉截距后赋值给gradient_without_intercept
             gradient_without_intercept = gradient[: -1]
         else:
             gradient_without_intercept = gradient
-
+        # 计算新的权重
         new_weights = np.sign(coef_ - gradient_without_intercept) * np.maximum(0, np.abs(
             coef_ - gradient_without_intercept) - self.shrinkage_val)
 
-        if model_weights.fit_intercept:
-            new_weights = np.append(new_weights, model_weights.intercept_)
-            new_weights[-1] -= gradient[-1]
+        if model_weights.fit_intercept:  # 如果包含截距，将新的权重数组添加到
+            new_weights = np.append(new_weights, model_weights.intercept_)  # 把截距项添加到数
+            new_weights[-1] -= gradient[-1]  # 对截距的值进行调整
         new_param = LinearModelWeights(new_weights, model_weights.fit_intercept, model_weights.raise_overflow_error)
         # LOGGER.debug("In _l1_updator, original weight: {}, new_weights: {}".format(
         #     model_weights.unboxed, new_weights
         # ))
         return new_param
 
+    # L2正则化
     def _l2_updator(self, lr_weights: LinearModelWeights, gradient):
         """
         For l2 regularization, the regular term has been added in gradients.
         """
 
-        new_weights = lr_weights.unboxed - gradient
+        new_weights = lr_weights.unboxed - gradient  # 原始权重数组 - 梯度数组 得到新的权重
         new_param = LinearModelWeights(new_weights, lr_weights.fit_intercept, lr_weights.raise_overflow_error)
 
         return new_param
 
+    # 这段代码实现了一个用于添加正则化项到梯度的方法。
+    # 正则化是一种用于控制模型复杂度并减少过拟合的技术，通过在损失函数中添加正则化项来实现。
     def add_regular_to_grad(self, grad, lr_weights):
 
         if self.penalty == consts.L2_PENALTY:
@@ -200,9 +206,9 @@ class _Optimizer(object):
         return model_weights
 
 
-class _SgdOptimizer(_Optimizer):
+class _SgdOptimizer(_Optimizer):  # 随机梯度下降（SGD）优化器
     def apply_gradients(self, grad):
-        learning_rate = self.decay_learning_rate()
+        learning_rate = self.decay_learning_rate()  # 计算本次迭代的学习率
 
         delta_grad = learning_rate * grad
         # LOGGER.debug("In sgd optimizer, learning_rate: {}, delta_grad: {}".format(learning_rate, delta_grad))

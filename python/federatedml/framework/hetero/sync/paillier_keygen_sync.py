@@ -40,15 +40,15 @@ class Arbiter(object):
 
 class _Client(object):
     # noinspection PyAttributeOutsideInit
-    def _register_paillier_keygen(self, pubkey_transfer):
+    def _register_paillier_keygen(self, pubkey_transfer):  # 生成公钥
         self._pubkey_transfer = pubkey_transfer
 
     def gen_paillier_cipher_operator(self, suffix=tuple(), method=consts.PAILLIER):
         pubkey = self._pubkey_transfer.get(idx=0, suffix=suffix)
 
-        if method == consts.PAILLIER:
+        if method == consts.PAILLIER:  # 帕耶同态加密算法
             cipher = PaillierEncrypt()
-        elif method == consts.PAILLIER_IPCL:
+        elif method == consts.PAILLIER_IPCL:  # intel芯片加速的帕耶同态加密算法
             cipher = IpclPaillierEncrypt()
         else:
             raise ValueError(f"Unsupported encryption method: {method}")

@@ -39,5 +39,9 @@ pip install shortuuid==1.0.9
 pip install requests_toolbelt==0.9.1
 pip install cloudpickle==2.1.0
 pip install lmdb==1.3.0
+pip install pycryptodomex==3.15.0
+pip install fate-crypto==0.3.0
+pip install transformers==4.29.1
+
 ```
 

@@ -44,7 +44,7 @@ class LinearModelWeights(ListWeights):
     @property
     def coef_(self):
         if self.fit_intercept:
-            if paillier_check.is_single_ipcl_encrypted_number(self._weights):
+            if paillier_check.is_single_ipcl_encrypted_number(self._weights):  # 这里会判断是否是IPCL加密的
                 coeffs = ipcl_operator.get_coeffs(self._weights.item(0))
                 return np.array(coeffs)
 

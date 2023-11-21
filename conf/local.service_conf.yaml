@@ -143,7 +143,7 @@ fate_on_spark:
     grpc_port: 9310
 # external services
 fateboard:
-  host: 127.0.0.1
+  host: 192.168.10.91
   port: 8080
 
 enable_model_store: false

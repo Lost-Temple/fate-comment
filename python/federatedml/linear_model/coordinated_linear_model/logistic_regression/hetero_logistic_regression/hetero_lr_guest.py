@@ -142,7 +142,7 @@ class HeteroLRGuest(HeteroLRBase):
                 LOGGER.debug(
                     "iter: {}, batch: {}, before compute gradient, data count: {}".format(
                         self.n_iter_, batch_index, batch_feat_inst.count()))
-
+                # 这里比较重要，会使用加密
                 optim_guest_gradient = self.gradient_loss_operator.compute_gradient_procedure(
                     batch_feat_inst,
                     self.cipher_operator,

@@ -36,17 +36,17 @@ def get_coeffs(weights):
     Returns:
         (IpclPaillierEncryptedNumber): all coefficients in one encrypted number
     """
-    coeff_num = weights.__len__() - 1
-    pub_key = weights.public_key
+    coeff_num = weights.__len__() - 1  # 减1是因为权重数组中的最后一个元素是截距项，则在这个函数中我们只对系数进行处理
+    pub_key = weights.public_key  # 获取构重数组的公钥信息
 
-    bn = []
-    exp = []
-    for i in range(coeff_num):
-        bn.append(weights.ciphertextBN(i))
-        exp.append(weights.exponent(i))
-    ct = ipclCipherText(pub_key.pubkey, bn)
+    bn = []  # 存储系数密文
+    exp = []  # 存储系数的指数
+    for i in range(coeff_num):  # 遍历权重数据中的系数
+        bn.append(weights.ciphertextBN(i))  # 将权重系数的密文加入到bn
+        exp.append(weights.exponent(i))  # 将权重系数的指数加入到exp
+    ct = ipclCipherText(pub_key.pubkey, bn)  # 以前面获取的公钥和系数密文数组为参数创建一个新的密文对象
+    # 返回一个新的 IpclPaillierEncryptedNumber 对象，其中包含了公钥、系数的密文和指数信息，以及系数的数量
     return IpclPaillierEncryptedNumber(pub_key, ct, exp, coeff_num)
-
 
 def get_intercept(weights):
     """
