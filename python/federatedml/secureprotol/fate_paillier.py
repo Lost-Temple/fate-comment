@@ -94,7 +94,7 @@ class PaillierPublicKey(object):
 
         return ciphertext
 
-    def encrypt(self, value, precision=None, random_value=None):
+    def encrypt(self, value, precision=None, random_value=None):  # 使用帕耶同态加密
         """Encode and Paillier encrypt a real number value.
         """
         if isinstance(value, FixedPointNumber):

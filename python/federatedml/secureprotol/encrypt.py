@@ -86,8 +86,8 @@ class Encrypt(object):
         decrypt_table = X.mapValues(lambda x: self.recursive_decrypt(x))
         return decrypt_table
 
-    def distribute_encrypt(self, X):
-        encrypt_table = X.mapValues(lambda x: self.recursive_encrypt(x))
+    def distribute_encrypt(self, X):  # 1. 加密调用入口
+        encrypt_table = X.mapValues(lambda x: self.recursive_encrypt(x))  # 执行recursive_encrypt
         return encrypt_table
 
     def distribute_raw_decrypt(self, X):
@@ -96,7 +96,7 @@ class Encrypt(object):
     def distribute_raw_encrypt(self, X):
         return X.mapValues(lambda x: self.recursive_raw_encrypt(x))
 
-    def _recursive_func(self, obj, func):
+    def _recursive_func(self, obj, func):  # 2. 被recursive_encrypt调用
         if isinstance(obj, np.ndarray):
             if len(obj.shape) == 1:
                 return np.reshape([func(val) for val in obj], obj.shape)
@@ -110,10 +110,10 @@ class Encrypt(object):
                 for o in obj
             )
         else:
-            return func(obj)
+            return func(obj)  # 这里执行func， 传进来的是encrypt,那就是执行 encrypt(obj)
 
-    def recursive_encrypt(self, X):
-        return self._recursive_func(X, self.encrypt)
+    def recursive_encrypt(self, X):  # 2. 被distribute_encrypt调用
+        return self._recursive_func(X, self.encrypt)  # 执行_recursive_func, 传入encrypt作为lambda函数
 
     def recursive_decrypt(self, X):
         return self._recursive_func(X, self.decrypt)
@@ -200,9 +200,9 @@ class PaillierEncrypt(Encrypt):
     def get_privacy_key(self):
         return self.privacy_key
 
-    def encrypt(self, value):
+    def encrypt(self, value):  # 3. 被_recursive_func 调用
         if self.public_key is not None:
-            return self.public_key.encrypt(value)
+            return self.public_key.encrypt(value)  # 这里调用 python/federatedml/secureprotol/fate_paillier.py 内部的代码
         else:
             return None
 

@@ -159,7 +159,7 @@ class Guest(HeteroGradientBase):
 
     def _asynchronous_compute_gradient(self, data_instances, model_weights, cipher, current_suffix):
         LOGGER.debug("Called asynchronous gradient")
-        encrypted_half_d = cipher.distribute_encrypt(self.half_d)
+        encrypted_half_d = cipher.distribute_encrypt(self.half_d)  # 这里同态加密
         self.remote_fore_gradient(encrypted_half_d, suffix=current_suffix)
 
         half_g = self.compute_gradient(data_instances, self.half_d, False)
@@ -276,7 +276,7 @@ class Host(HeteroGradientBase):
         raise NotImplementedError("Function should not be called here")
 
     def _asynchronous_compute_gradient(self, data_instances, cipher, current_suffix):
-        encrypted_forward = cipher.distribute_encrypt(self.forwards)
+        encrypted_forward = cipher.distribute_encrypt(self.forwards)  # 调用加密
         self.remote_host_forward(encrypted_forward, suffix=current_suffix)
 
         half_g = self.compute_gradient(data_instances, self.forwards, False)

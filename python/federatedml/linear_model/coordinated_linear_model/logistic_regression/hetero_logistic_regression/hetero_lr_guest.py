@@ -127,7 +127,7 @@ class HeteroLRGuest(HeteroLRBase):
         else:
             self.callback_warm_start_init_iter(self.n_iter_)
 
-        while self.n_iter_ < self.max_iter:
+        while self.n_iter_ < self.max_iter:  # 循环，每一次循环是一次迭代，直到达到最大迭代次数
             self.callback_list.on_epoch_begin(self.n_iter_)
             LOGGER.info("iter: {}".format(self.n_iter_))
             batch_data_generator = self.batch_generator.generate_batch_data(suffix=(self.n_iter_, ), with_index=True)
@@ -142,7 +142,7 @@ class HeteroLRGuest(HeteroLRBase):
                 LOGGER.debug(
                     "iter: {}, batch: {}, before compute gradient, data count: {}".format(
                         self.n_iter_, batch_index, batch_feat_inst.count()))
-                # 这里比较重要，会使用加密
+                # 计算梯度，会使用加密
                 optim_guest_gradient = self.gradient_loss_operator.compute_gradient_procedure(
                     batch_feat_inst,
                     self.cipher_operator,
