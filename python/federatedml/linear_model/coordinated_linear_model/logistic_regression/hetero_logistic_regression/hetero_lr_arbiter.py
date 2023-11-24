@@ -51,13 +51,13 @@ class HeteroLRArbiter(HeteroBaseArbiter, HeteroLRBase):
         LOGGER.debug("Has loss_history: {}".format(hasattr(self, 'loss_history')))
         LOGGER.debug("Need one_vs_rest: {}".format(self.need_one_vs_rest))
         classes = self.one_vs_rest_obj.get_data_classes(data_instances)
-        if len(classes) > 2:
+        if len(classes) > 2:  # 多分类
             self.need_one_vs_rest = True
             self.need_call_back_loss = False
             self.one_vs_rest_fit(train_data=data_instances, validate_data=validate_data)
-        else:
+        else:  # 2分类
             self.need_one_vs_rest = False
-            super().fit(data_instances, validate_data)
+            super().fit(data_instances, validate_data)  # 调用父类的fit方法
 
     def fit_binary(self, data_instances, validate_data):
         super().fit(data_instances, validate_data)

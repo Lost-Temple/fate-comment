@@ -48,15 +48,15 @@ class HeteroLRHost(HeteroLRBase):
 
         LOGGER.info("Enter hetero_logistic_regression host")
         # self.header = self.get_header(data_instances)
-        self.prepare_fit(data_instances, validate_data)
+        self.prepare_fit(data_instances, validate_data)  # 做一些预检测的工作，如：数据集是否空；检查每个分区数据集中特征值是否溢出；
 
-        classes = self.one_vs_rest_obj.get_data_classes(data_instances)
+        classes = self.one_vs_rest_obj.get_data_classes(data_instances)  # 获取分类信息
 
-        if len(classes) > 2:
+        if len(classes) > 2:  # 多分类
             self.need_one_vs_rest = True
             self.need_call_back_loss = False
             self.one_vs_rest_fit(train_data=data_instances, validate_data=validate_data)
-        else:
+        else:  # 2分类
             self.need_one_vs_rest = False
             self.fit_binary(data_instances, validate_data)
 
@@ -70,7 +70,7 @@ class HeteroLRHost(HeteroLRBase):
         LOGGER.debug(f"MODEL_STEP Start fin_binary, data count: {data_instances.count()}")
 
         self.header = self.get_header(data_instances)
-        model_shape = self.get_features_shape(data_instances)
+        model_shape = self.get_features_shape(data_instances)  # 这里就是返回总共多少个特征列
         self.cipher_operator = self.cipher.gen_paillier_cipher_operator(method=self.model_param.encrypt_param.method)
 
         self.batch_generator.initialize_batch_generator(data_instances, shuffle=self.shuffle)
@@ -88,9 +88,9 @@ class HeteroLRHost(HeteroLRBase):
         if self.init_param_obj.fit_intercept:
             self.init_param_obj.fit_intercept = False
 
-        if not self.component_properties.is_warm_start:
-            w = self.initializer.init_model(model_shape, init_params=self.init_param_obj)
-            self.model_weights = LinearModelWeights(w, fit_intercept=self.init_param_obj.fit_intercept)
+        if not self.component_properties.is_warm_start:  # 如果 不是 热启动
+            w = self.initializer.init_model(model_shape, init_params=self.init_param_obj)  # 初始化模型，会根据配置初始化函数作不同方式的初始化
+            self.model_weights = LinearModelWeights(w, fit_intercept=self.init_param_obj.fit_intercept)  #
         else:
             self.callback_warm_start_init_iter(self.n_iter_)
 

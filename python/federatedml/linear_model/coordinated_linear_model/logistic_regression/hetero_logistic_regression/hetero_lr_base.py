@@ -40,7 +40,7 @@ class HeteroLRBase(BaseLogisticRegression):
         self.gradient_loss_operator = None
         self.converge_procedure = None
         self.model_param = HeteroLogisticParam()
-        self.transfer_variable = HeteroLRTransferVariable()
+        self.transfer_variable = HeteroLRTransferVariable()  # 用来在联邦间发送数据
 
     def _init_model(self, params):
         super()._init_model(params)

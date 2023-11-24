@@ -70,7 +70,7 @@ class HeteroLRGuest(HeteroLRBase):
         # self.header = self.get_header(data_instances)
         self.prepare_fit(data_instances, validate_data)
 
-        classes = self.one_vs_rest_obj.get_data_classes(data_instances)
+        classes = self.one_vs_rest_obj.get_data_classes(data_instances)  # 获取数据集中的分类信息
 
         if with_weight(data_instances):
             data_instances = scale_sample_weight(data_instances)
@@ -142,7 +142,7 @@ class HeteroLRGuest(HeteroLRBase):
                 LOGGER.debug(
                     "iter: {}, batch: {}, before compute gradient, data count: {}".format(
                         self.n_iter_, batch_index, batch_feat_inst.count()))
-                # 计算梯度，会使用加密
+                # 计算梯度，会使用同态加密
                 optim_guest_gradient = self.gradient_loss_operator.compute_gradient_procedure(
                     batch_feat_inst,
                     self.cipher_operator,
@@ -157,19 +157,19 @@ class HeteroLRGuest(HeteroLRBase):
                 self.gradient_loss_operator.compute_loss(batch_feat_inst, self.model_weights, self.n_iter_, batch_index,
                                                          loss_norm, batch_masked=self.batch_generator.batch_masked)
 
-                self.model_weights = self.optimizer.update_model(self.model_weights, optim_guest_gradient)
+                self.model_weights = self.optimizer.update_model(self.model_weights, optim_guest_gradient)  # 这里使用优化器更新模型
                 batch_index += 1
 
-            self.is_converged = self.converge_procedure.sync_converge_info(suffix=(self.n_iter_,))
+            self.is_converged = self.converge_procedure.sync_converge_info(suffix=(self.n_iter_,))  # 是否收敛了
             LOGGER.info("iter: {},  is_converged: {}".format(self.n_iter_, self.is_converged))
 
             self.callback_list.on_epoch_end(self.n_iter_)
             self.n_iter_ += 1
 
-            if self.stop_training:
+            if self.stop_training:  # 如果停止训练就跳出循环
                 break
 
-            if self.is_converged:
+            if self.is_converged:  # 如果是收敛了就跳出循环
                 break
         self.callback_list.on_train_end()
 

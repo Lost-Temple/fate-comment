@@ -60,7 +60,7 @@ class OneVsRest(object):
         get all classes in data_instances
         """
         class_set = None
-        if self.has_label:
+        if self.has_label:  # 如果包含标签，guest 方数据有标签，而host 方数据无标签
             num_class, class_list = ClassifyLabelChecker.validate_label(data_instances)
             class_set = set(class_list)
         self._synchronize_classes_list(class_set)
@@ -96,11 +96,11 @@ class OneVsRest(object):
         host and arbiter as binary classification times.
         """
         if self.role == consts.GUEST:
-            self._sync_class_guest(class_set)
+            self._sync_class_guest(class_set)  # guest 调用，从数据中获取类别信息，并对其进行汇总分类
         elif self.role == consts.HOST:
-            self._sync_class_host(class_set)
+            self._sync_class_host(class_set)  # host 调用
         else:
-            self._sync_class_arbiter()
+            self._sync_class_arbiter()  # arbiter 调用
 
     @property
     def has_label(self):
@@ -286,9 +286,9 @@ class HeteroOneVsRest(OneVsRest):
             return True
         return False
 
-    def _sync_class_guest(self, class_set):
-        self.classes = list(class_set)
-        class_num = len(self.classes)
+    def _sync_class_guest(self, class_set):  # 把分类数共享给HOST和ARBITER
+        self.classes = list(class_set)  # class_set 的值如： {0, 1}
+        class_num = len(self.classes)  # 分类数量
         self.transfer_variable.aggregate_classes.remote(class_num,
                                                         role=consts.HOST,
                                                         idx=-1)
@@ -297,12 +297,12 @@ class HeteroOneVsRest(OneVsRest):
                                                             role=consts.ARBITER,
                                                             idx=0)
 
-    def _sync_class_host(self, class_set):
+    def _sync_class_host(self, class_set):  # 获取分类数，并根据分类数生成classes
         LOGGER.debug("Start to get aggregate classes")
         class_nums = self.transfer_variable.aggregate_classes.get(idx=0)
-        self.classes = [x for x in range(class_nums)]
+        self.classes = [x for x in range(class_nums)]  # 比如分类数为2，那么self.classes的值为 {0, 1}
 
-    def _sync_class_arbiter(self):
+    def _sync_class_arbiter(self):  # 同上
         class_nums = self.transfer_variable.aggregate_classes.get(idx=0)
         self.classes = [x for x in range(class_nums)]
 

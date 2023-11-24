@@ -159,14 +159,18 @@ class Guest(HeteroGradientBase):
 
     def _asynchronous_compute_gradient(self, data_instances, model_weights, cipher, current_suffix):
         LOGGER.debug("Called asynchronous gradient")
+        LOGGER.debug(f"[guest], half_d before encrypt: {self.half_d}")
         encrypted_half_d = cipher.distribute_encrypt(self.half_d)  # 这里同态加密
-        self.remote_fore_gradient(encrypted_half_d, suffix=current_suffix)
-
-        half_g = self.compute_gradient(data_instances, self.half_d, False)
-        self.host_forwards = self.get_host_forward(suffix=current_suffix)
+        LOGGER.debug(f"[guest], half_d after encrypt->encrypted_half_d: {encrypted_half_d}")
+        self.remote_fore_gradient(encrypted_half_d, suffix=current_suffix)  # 把加密后的发送给HOST
+        LOGGER.debug(f"[guest], send encrypted_half_d to host: {encrypted_half_d}")
+        half_g = self.compute_gradient(data_instances, self.half_d, False)  # 计算本地梯度 half_g
+        self.host_forwards = self.get_host_forward(suffix=current_suffix)  # 获取由HOST发送的forward
+        LOGGER.debug(f"[guest], receive encrypted_forward from host: {self.host_forwards}")
         host_forward = self.host_forwards[0]
-        host_half_g = self.compute_gradient(data_instances, host_forward, False)
-        unilateral_gradient = half_g + host_half_g
+
+        host_half_g = self.compute_gradient(data_instances, host_forward, False)  # 使用host_forward，本地的数据集，计算host_half_g
+        unilateral_gradient = half_g + host_half_g  # guest_half_g + host_half_g
         if model_weights.fit_intercept:
             n = data_instances.count()
             intercept = (host_forward.reduce(lambda x, y: x + y) + self.half_d.reduce(lambda x, y: x + y)) / n
@@ -237,9 +241,13 @@ class Guest(HeteroGradientBase):
                                                                      masked_index=masked_index)
 
         if optimizer is not None:
+            LOGGER.debug(f"[guest], unilateral_gradient before add_regular_to_grad: {unilateral_gradient}")
             unilateral_gradient = optimizer.add_regular_to_grad(unilateral_gradient, model_weights)
+            LOGGER.debug(f"[guest], unilateral_gradient after add_regular_to_grad: {unilateral_gradient}")
 
+        LOGGER.debug(f"[guest], send unilateral_gradient to arbiter: {unilateral_gradient}")
         optimized_gradient = self.update_gradient(unilateral_gradient, suffix=current_suffix)
+        LOGGER.debug(f"[guest], receive optimized_gradient from arbiter: {optimized_gradient}")
         # LOGGER.debug(f"Before return, optimized_gradient: {optimized_gradient}")
         return optimized_gradient
 
@@ -251,8 +259,8 @@ class Guest(HeteroGradientBase):
         self.fore_gradient_transfer.remote(obj=fore_gradient, role=consts.HOST, idx=-1, suffix=suffix)
 
     def update_gradient(self, unilateral_gradient, suffix=tuple()):
-        self.unilateral_gradient_transfer.remote(unilateral_gradient, role=consts.ARBITER, idx=0, suffix=suffix)
-        optimized_gradient = self.unilateral_optim_gradient_transfer.get(idx=0, suffix=suffix)
+        self.unilateral_gradient_transfer.remote(unilateral_gradient, role=consts.ARBITER, idx=0, suffix=suffix)  # 把单边梯度发送给ARBITER
+        optimized_gradient = self.unilateral_optim_gradient_transfer.get(idx=0, suffix=suffix)  # 获取unilateral_optim_gradient
         return optimized_gradient
 
 
@@ -276,11 +284,14 @@ class Host(HeteroGradientBase):
         raise NotImplementedError("Function should not be called here")
 
     def _asynchronous_compute_gradient(self, data_instances, cipher, current_suffix):
+        LOGGER.debug(f"[host], host_forwards before encrypt: {self.forwards}")
         encrypted_forward = cipher.distribute_encrypt(self.forwards)  # 调用加密
-        self.remote_host_forward(encrypted_forward, suffix=current_suffix)
-
+        LOGGER.debug(f"[host], host_forwards after encrypt->encrypted_forward: {encrypted_forward}")
+        self.remote_host_forward(encrypted_forward, suffix=current_suffix)  # 加密后发给GUEST
+        LOGGER.debug(f"[host], send encrypted_forward to guest: {encrypted_forward}")
         half_g = self.compute_gradient(data_instances, self.forwards, False)
-        guest_half_d = self.get_fore_gradient(suffix=current_suffix)
+        guest_half_d = self.get_fore_gradient(suffix=current_suffix)  # 获取 fore_gradient, 这个就是由GUEST发送给HOST的加密后的half_d
+        LOGGER.debug(f"[host], receive encrypted_half_d from guest: {guest_half_d}")
         guest_half_g = self.compute_gradient(data_instances, guest_half_d, False)
         unilateral_gradient = half_g + guest_half_g
         return unilateral_gradient
@@ -319,9 +330,13 @@ class Host(HeteroGradientBase):
                                                                      current_suffix)
 
         if optimizer is not None:
+            LOGGER.debug(f"[host], unilateral_gradient before add_regular_to_grad: {unilateral_gradient}")
             unilateral_gradient = optimizer.add_regular_to_grad(unilateral_gradient, model_weights)
+            LOGGER.debug(f"[host], unilateral_gradient after add_regular_to_grad: {unilateral_gradient}")
 
+        LOGGER.debug(f"[host], send unilateral_gradient to arbiter: {unilateral_gradient}")
         optimized_gradient = self.update_gradient(unilateral_gradient, suffix=current_suffix)
+        LOGGER.debug(f"[host], receive optimized_gradient from arbiter: {optimized_gradient}")
         LOGGER.debug(f"Before return compute_gradient_procedure")
         return optimized_gradient
 
@@ -357,7 +372,7 @@ class Host(HeteroGradientBase):
         return host_forward
 
     def update_gradient(self, unilateral_gradient, suffix=tuple()):
-        self.unilateral_gradient_transfer.remote(unilateral_gradient, role=consts.ARBITER, idx=0, suffix=suffix)
+        self.unilateral_gradient_transfer.remote(unilateral_gradient, role=consts.ARBITER, idx=0, suffix=suffix)  # 把单边梯度发送给ARBITER
         optimized_gradient = self.unilateral_optim_gradient_transfer.get(idx=0, suffix=suffix)
         return optimized_gradient
 
@@ -390,10 +405,10 @@ class Arbiter(HeteroGradientBase):
 
         """
         current_suffix = (n_iter_, batch_index)
-
+        # 接收来自host和guest的 unilateral_gradient
         host_gradients, guest_gradient = self.get_local_gradient(current_suffix)
 
-        if len(host_gradients) > 1:
+        if len(host_gradients) > 1:  # 多Host的情况
             self.has_multiple_hosts = True
 
         host_gradients = [np.array(h) for h in host_gradients]
@@ -405,13 +420,13 @@ class Arbiter(HeteroGradientBase):
         gradient = np.hstack((h for h in host_gradients))
         gradient = np.hstack((gradient, guest_gradient))
 
-        grad = np.array(cipher.decrypt_list(gradient))
+        grad = np.array(cipher.decrypt_list(gradient))  # 解密
 
         # LOGGER.debug("In arbiter compute_gradient_procedure, before apply grad: {}, size_list: {}".format(
         #     grad, size_list
         # ))
 
-        delta_grad = optimizer.apply_gradients(grad)
+        delta_grad = optimizer.apply_gradients(grad)  # 这里调用优化器子类的apply_gradients方法
 
         # LOGGER.debug("In arbiter compute_gradient_procedure, delta_grad: {}".format(
         #     delta_grad
@@ -422,7 +437,7 @@ class Arbiter(HeteroGradientBase):
         # ))
         host_optim_gradients = separate_optim_gradient[: -1]
         guest_optim_gradient = separate_optim_gradient[-1]
-
+        # 向HOST和GUEST发送optim_gradient
         self.remote_local_gradient(host_optim_gradients, guest_optim_gradient, current_suffix)
         return delta_grad
 
@@ -449,19 +464,25 @@ class Arbiter(HeteroGradientBase):
 
     def get_local_gradient(self, suffix=tuple()):
         host_gradients = self.host_gradient_transfer.get(idx=-1, suffix=suffix)
-        LOGGER.info("Get host_gradient from Host")
+        # LOGGER.info("Get host_gradient from Host")
 
         guest_gradient = self.guest_gradient_transfer.get(idx=0, suffix=suffix)
-        LOGGER.info("Get guest_gradient from Guest")
+        # LOGGER.info("Get guest_gradient from Guest")
+
+        LOGGER.debug(f"[arbiter], receive unilateral_gradient from host: {host_gradients}")
+        LOGGER.debug(f"[arbiter], receive unilateral_gradient from guest: {guest_gradient}")
+
         return host_gradients, guest_gradient
 
     def remote_local_gradient(self, host_optim_gradients, guest_optim_gradient, suffix=tuple()):
         for idx, host_optim_gradient in enumerate(host_optim_gradients):
+            LOGGER.debug(f"[arbiter], send optim_gradient to host: {host_optim_gradient}")
             self.host_optim_gradient_transfer.remote(host_optim_gradient,
                                                      role=consts.HOST,
                                                      idx=idx,
                                                      suffix=suffix)
 
+        LOGGER.debug(f"[arbiter], send optim_gradient to guest: {guest_optim_gradient}")
         self.guest_optim_gradient_transfer.remote(guest_optim_gradient,
                                                   role=consts.GUEST,
                                                   idx=0,

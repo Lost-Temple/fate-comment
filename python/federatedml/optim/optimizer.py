@@ -24,12 +24,12 @@ from federatedml.util import LOGGER, consts, paillier_check, ipcl_operator
 
 class _Optimizer(object):
     def __init__(self, learning_rate, alpha, penalty, decay, decay_sqrt, mu=0):
-        self.learning_rate = learning_rate
-        self.iters = 0
-        self.alpha = alpha
-        self.penalty = penalty
-        self.decay = decay
-        self.decay_sqrt = decay_sqrt
+        self.learning_rate = learning_rate  # 学习率
+        self.iters = 0  # 迭代轮次
+        self.alpha = alpha  # 正则化强度系数
+        self.penalty = penalty  # 惩罚方法
+        self.decay = decay  # 衰减率，用来表示学习率的衰减速度
+        self.decay_sqrt = decay_sqrt  # 是否开方衰减
         self.mu = mu
 
     # 这个方法的目的是提供一个能够随着训练步数增加而逐渐减小的学习率，以帮助模型更好地收敛到最优解。

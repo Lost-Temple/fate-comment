@@ -159,5 +159,5 @@ class Arbiter(hetero_linear_model_gradient.Arbiter, loss_sync.Arbiter):
         """
         current_suffix = (n_iter_, batch_index)
         loss_list = self.sync_loss_info(suffix=current_suffix)
-        de_loss_list = cipher.decrypt_list(loss_list)
+        de_loss_list = cipher.decrypt_list(loss_list)  # 解密
         return de_loss_list

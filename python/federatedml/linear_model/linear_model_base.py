@@ -78,9 +78,9 @@ class BaseLinearModel(ModelBase):
             self.batch_strategy = params.batch_strategy
 
         self.max_iter = params.max_iter
-        self.optimizer = optimizer_factory(params)
+        self.optimizer = optimizer_factory(params)  # 创建优化器
         self.early_stop = params.early_stop
-        self.tol = params.tol
+        self.tol = params.tol  # 收敛容忍度
         self.converge_func = converge_func_factory(params.early_stop, params.tol)
         self.validation_freqs = params.callback_param.validation_freqs
         self.validation_strategy = None
@@ -217,7 +217,7 @@ class BaseLinearModel(ModelBase):
         if data_instances is None:
             return
 
-        def _check_overflow(data_iter):
+        def _check_overflow(data_iter):  # 检查数据中是否存在特征数值过大或过小的情况，绝对值超过阈值就是溢出，返回True,否则False
             for _, instant in data_iter:
                 features = instant.features
                 if isinstance(features, SparseVector):

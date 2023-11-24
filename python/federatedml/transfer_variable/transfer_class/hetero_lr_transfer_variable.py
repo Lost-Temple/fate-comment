@@ -27,7 +27,7 @@ from federatedml.transfer_variable.base_transfer_variable import BaseTransferVar
 
 
 # noinspection PyAttributeOutsideInit
-class HeteroLRTransferVariable(BaseTransferVariables):
+class HeteroLRTransferVariable(BaseTransferVariables):  # 这里定义了纵向逻辑回归流程中所有需要在联邦间进行交互的数据
     def __init__(self, flowid=0):
         super().__init__(flowid)
         self.batch_data_index = self._create_variable(name='batch_data_index', src=['guest'], dst=['host'])

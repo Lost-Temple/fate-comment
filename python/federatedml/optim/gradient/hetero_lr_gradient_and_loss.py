@@ -104,7 +104,9 @@ class Guest(hetero_linear_model_gradient.Guest, loss_sync.Guest):
 
         loss_list = []
 
-        wx_squares = self.get_host_loss_intermediate(suffix=current_suffix)
+        wx_squares = self.get_host_loss_intermediate(suffix=current_suffix)  # 从HOST获取损失值
+        LOGGER.debug(f"[guest], receive en_wx_square from host: {wx_squares}")
+
         if batch_masked:
             wx_squares_sum = []
             for square_table in wx_squares:
@@ -119,7 +121,8 @@ class Guest(hetero_linear_model_gradient.Guest, loss_sync.Guest):
             wx_squares = wx_squares_sum
 
         if loss_norm is not None:
-            host_loss_regular = self.get_host_loss_regular(suffix=current_suffix)
+            host_loss_regular = self.get_host_loss_regular(suffix=current_suffix)  # 从HOST获取
+            LOGGER.debug(f"[guest], receive en_loss_regular from host: {host_loss_regular}")
         else:
             host_loss_regular = []
 
@@ -136,8 +139,9 @@ class Guest(hetero_linear_model_gradient.Guest, loss_sync.Guest):
                 loss += loss_norm
                 loss += host_loss_regular[0]
             loss_list.append(loss)
-        LOGGER.debug("In compute_loss, loss list are: {}".format(loss_list))
-        self.sync_loss_info(loss_list, suffix=current_suffix)
+        # LOGGER.debug("In compute_loss, loss list are: {}".format(loss_list))
+        LOGGER.debug(f"[guest], send loss_list to arbiter: {loss_list}")
+        self.sync_loss_info(loss_list, suffix=current_suffix)  # 把loss_list 发送给 arbiter
 
     def compute_forward_hess(self, data_instances, delta_s, host_forwards):
         """
@@ -201,16 +205,24 @@ class Host(hetero_linear_model_gradient.Host, loss_sync.Host):
         self_wx_square = self.forwards.mapValues(lambda x: np.square(4 * x))
         if not batch_masked:
             self_wx_square = self_wx_square.reduce(reduce_add)
+            LOGGER.debug(f"[host], self_wx_square before encrypt: {self_wx_square}")
             en_wx_square = cipher_operator.encrypt(self_wx_square)  # 同态加密
+            LOGGER.debug(f"[host], self_wx_square after encrypt->en_wx_square: {en_wx_square}")
         else:
+            LOGGER.debug(f"[host], self_wx_square before encrypt: {self_wx_square}")
             en_wx_square = self_wx_square.mapValues(lambda x: cipher_operator.encrypt(x))  # lambda函数，同态加密
+            LOGGER.debug(f"[host], self_wx_square after encrypt->en_wx_square: {en_wx_square}")
 
-        self.remote_loss_intermediate(en_wx_square, suffix=current_suffix)
+        LOGGER.debug(f"[host], send en_wx_square to guest: {en_wx_square}")
+        self.remote_loss_intermediate(en_wx_square, suffix=current_suffix)  # 发送给guest
 
         loss_regular = optimizer.loss_norm(lr_weights)
         if loss_regular is not None:
+            LOGGER.debug(f"[host], loss_regular before encrypt: {loss_regular}")
             en_loss_regular = cipher_operator.encrypt(loss_regular)  # 同态加密
-            self.remote_loss_regular(en_loss_regular, suffix=current_suffix)
+            LOGGER.debug(f"[host], loss_regular after encrypt->en_loss_regular: {en_loss_regular}")
+            LOGGER.debug(f"[host], send en_loss_regular to guest: {en_loss_regular}")
+            self.remote_loss_regular(en_loss_regular, suffix=current_suffix)  # 发送给guest
 
 
 class Arbiter(hetero_linear_model_gradient.Arbiter, loss_sync.Arbiter):
@@ -231,11 +243,12 @@ class Arbiter(hetero_linear_model_gradient.Arbiter, loss_sync.Arbiter):
 
         where Wh*Xh is a table obtain from host and ∑(Wh*Xh)^2 is a sum number get from host.
         """
-        if self.has_multiple_hosts:
+        if self.has_multiple_hosts:  # 多HOST情况下， 直接就返回一个空数组
             LOGGER.info("Has more than one host, loss is not available")
             return []
 
         current_suffix = (n_iter_, batch_index)
-        loss_list = self.sync_loss_info(suffix=current_suffix)
-        de_loss_list = cipher.decrypt_list(loss_list)
+        loss_list = self.sync_loss_info(suffix=current_suffix)  # 获取LOSS_LIST
+        LOGGER.debug(f"[arbiter], receive loss_list from guest: {loss_list}")
+        de_loss_list = cipher.decrypt_list(loss_list)  # 解密
         return de_loss_list
