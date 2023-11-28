@@ -160,10 +160,11 @@ class Guest(HeteroGradientBase):
     def _asynchronous_compute_gradient(self, data_instances, model_weights, cipher, current_suffix):
         LOGGER.debug("Called asynchronous gradient")
         LOGGER.debug(f"[guest], half_d before encrypt: {self.half_d}")
-        encrypted_half_d = cipher.distribute_encrypt(self.half_d)  # 这里同态加密
+        # 这里同态加密, 这里的half_d的数据类型为:<fate_arch.computing.standalone._table.Table>
+        encrypted_half_d = cipher.distribute_encrypt(self.half_d)
         LOGGER.debug(f"[guest], half_d after encrypt->encrypted_half_d: {encrypted_half_d}")
-        self.remote_fore_gradient(encrypted_half_d, suffix=current_suffix)  # 把加密后的发送给HOST
         LOGGER.debug(f"[guest], send encrypted_half_d to host: {encrypted_half_d}")
+        self.remote_fore_gradient(encrypted_half_d, suffix=current_suffix)  # 把加密后的发送给HOST
         half_g = self.compute_gradient(data_instances, self.half_d, False)  # 计算本地梯度 half_g
         self.host_forwards = self.get_host_forward(suffix=current_suffix)  # 获取由HOST发送的forward
         LOGGER.debug(f"[guest], receive encrypted_forward from host: {self.host_forwards}")
@@ -287,8 +288,8 @@ class Host(HeteroGradientBase):
         LOGGER.debug(f"[host], host_forwards before encrypt: {self.forwards}")
         encrypted_forward = cipher.distribute_encrypt(self.forwards)  # 调用加密
         LOGGER.debug(f"[host], host_forwards after encrypt->encrypted_forward: {encrypted_forward}")
-        self.remote_host_forward(encrypted_forward, suffix=current_suffix)  # 加密后发给GUEST
         LOGGER.debug(f"[host], send encrypted_forward to guest: {encrypted_forward}")
+        self.remote_host_forward(encrypted_forward, suffix=current_suffix)  # 加密后发给GUEST
         half_g = self.compute_gradient(data_instances, self.forwards, False)
         guest_half_d = self.get_fore_gradient(suffix=current_suffix)  # 获取 fore_gradient, 这个就是由GUEST发送给HOST的加密后的half_d
         LOGGER.debug(f"[host], receive encrypted_half_d from guest: {guest_half_d}")
