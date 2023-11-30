@@ -27,6 +27,8 @@ LOGGER = log.getLogger()
 
 class Table(CTableABC):
     def __init__(self, table):
+        # 这里的_table对象的类型为FATE/python/fate_arch/_standalone.py 中定义的Table，就是计算引擎中的数据集，
+        # 对应spark引擎中的rdd, eggroll中的rp
         self._table = table
         self._engine = ComputingEngine.STANDALONE
 

@@ -102,6 +102,7 @@ class HeteroGradientBase(object):
         is_sparse = data_overview.is_sparse_data(data_instances)
 
         LOGGER.debug("Use apply partitions")
+        # 把data_instances和fore_gradient进行连接
         feat_join_grad = data_instances.join(fore_gradient,
                                              lambda d, g: (d.features, g))
         f = functools.partial(self.__apply_cal_gradient,
@@ -172,8 +173,9 @@ class Guest(HeteroGradientBase):
 
         host_half_g = self.compute_gradient(data_instances, host_forward, False)  # 使用host_forward，本地的数据集，计算host_half_g
         unilateral_gradient = half_g + host_half_g  # guest_half_g + host_half_g
-        if model_weights.fit_intercept:
-            n = data_instances.count()
+        if model_weights.fit_intercept:  # 如果包含截距
+            n = data_instances.count()  # 样本数量
+            # 把host_forward中的数据进行累加，把half_d中的数据也进行累加，然后把它们的结果相加后再除以样本数量作为截距
             intercept = (host_forward.reduce(lambda x, y: x + y) + self.half_d.reduce(lambda x, y: x + y)) / n
             unilateral_gradient = np.append(unilateral_gradient, intercept)
         return unilateral_gradient

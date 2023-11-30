@@ -352,7 +352,7 @@ class Session(object):
     def load(self, name, namespace):
         return _load_table(session=self, name=name, namespace=namespace)
 
-    # 这个create_table 返回的是Table类型对象，而不是 StorageTable 哦。注意区别
+    # 这个create_table 返回的是Table类型对象（就在当前文件中定义的Table），而不是 StorageTable 哦。注意区别
     def create_table(self, name, namespace, partitions, need_cleanup, error_if_exist):
         return _create_table(
             session=self,
