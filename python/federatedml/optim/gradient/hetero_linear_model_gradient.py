@@ -105,6 +105,14 @@ class HeteroGradientBase(object):
         # 把data_instances和fore_gradient进行连接
         feat_join_grad = data_instances.join(fore_gradient,
                                              lambda d, g: (d.features, g))
+        # functools.partial 的作用：在原函数的基础上创建一个新的函数，利用原有函数的代码，可以省略掉相同的代码
+        # __apply_cal_gradient(data, fixed_point_encoder, is_sparse)中有3个参数
+        # 通过 functools.partial 的操作得到一个f函数对象，这个函数就只需要传入一个data参数即可
+        # 这样就实现了固定__apply_cal_gradient其中几个参数，一定程度上达到了缩减函数参数个数，
+        #
+        # 场景：有函数需要传入一个函数对象func，目前已有符合功能的函数A，但A和func的参数signature不同，
+        # 可以使用functools.partial 来给A提供某些参数的值来达到参数的“缩减”而创建出一个新的函数对象B，B的参数Signature
+        # 符合func的参数Signature即可
         f = functools.partial(self.__apply_cal_gradient,
                               fixed_point_encoder=self.fixed_point_encoder,
                               is_sparse=is_sparse)
