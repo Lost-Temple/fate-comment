@@ -230,8 +230,8 @@ class Guest(HeteroGradientBase):
 
         # Compute Guest's partial d
         self.compute_half_d(data_instances, model_weights, cipher,
-                            batch_index, current_suffix)
-        if self.use_async:
+                            batch_index, current_suffix)  # 会计算self.half_d的值
+        if self.use_async:  # 这个值会受batch_size的影响
             unilateral_gradient = self._asynchronous_compute_gradient(data_instances, model_weights,
                                                                       cipher=cipher,
                                                                       current_suffix=current_suffix)
@@ -418,7 +418,7 @@ class Arbiter(HeteroGradientBase):
         size_list = [h_g.shape[0] for h_g in host_gradients]
         size_list.append(guest_gradient.shape[0])
 
-        gradient = np.hstack((h for h in host_gradients))
+        gradient = np.hstack((h for h in host_gradients))  # np.hstack 就是 水平拼接
         gradient = np.hstack((gradient, guest_gradient))
 
         grad = np.array(cipher.decrypt_list(gradient))  # 解密

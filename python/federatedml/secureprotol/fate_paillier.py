@@ -34,15 +34,15 @@ class PaillierKeypair(object):
         n_len = 0
 
         while n_len != n_length:
-            p = gmpy_math.getprimeover(n_length // 2)
+            p = gmpy_math.getprimeover(n_length // 2)  # 生成长度为 n_length//2 的随机素数 p
             q = p
-            while q == p:
+            while q == p:   # 确保 q 和 p 不相等
                 q = gmpy_math.getprimeover(n_length // 2)
-            n = p * q
-            n_len = n.bit_length()
+            n = p * q  # 计算n的值
+            n_len = n.bit_length()  # n的值的bit length
 
-        public_key = PaillierPublicKey(n)
-        private_key = PaillierPrivateKey(public_key, p, q)
+        public_key = PaillierPublicKey(n)  # 根据n的值生成公钥
+        private_key = PaillierPrivateKey(public_key, p, q)  # 根据公钥，p，q生成私钥
 
         return public_key, private_key
 

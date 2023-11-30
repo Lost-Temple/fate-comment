@@ -77,13 +77,13 @@ def dot(value, w):
     return res
 
 
-def vec_dot(x, w):
+def vec_dot(x, w):  # 返回的是 x1*w1 + x2*w2 + x3*w3 ....
     new_data = 0
-    if isinstance(x, SparseVector):
+    if isinstance(x, SparseVector):  # 如果x是SparseVector对象
         for idx, v in x.get_all_data():
             # if idx < len(w):
             new_data += v * w[idx]
-    else:
+    else:  # 如果x不是是SparseVector对象
         new_data = np.dot(x, w)
     return new_data
 

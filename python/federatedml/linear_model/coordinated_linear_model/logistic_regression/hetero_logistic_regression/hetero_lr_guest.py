@@ -93,7 +93,7 @@ class HeteroLRGuest(HeteroLRBase):
 
         data_instances = data_instances.mapValues(HeteroLRGuest.load_data)
         LOGGER.debug(f"MODEL_STEP After load data, data count: {data_instances.count()}")
-        self.cipher_operator = self.cipher.gen_paillier_cipher_operator(method=self.model_param.encrypt_param.method)
+        self.cipher_operator = self.cipher.gen_paillier_cipher_operator(method=self.model_param.encrypt_param.method)  # 这里会获取帕耶同态加密的公钥（由ARBITER产生并发送的）
 
         self.batch_generator.initialize_batch_generator(data_instances, self.batch_size,
                                                         batch_strategy=self.batch_strategy,
@@ -133,7 +133,7 @@ class HeteroLRGuest(HeteroLRBase):
             batch_data_generator = self.batch_generator.generate_batch_data(suffix=(self.n_iter_, ), with_index=True)
             self.optimizer.set_iters(self.n_iter_)
             batch_index = 0
-            for batch_data, index_data in batch_data_generator:
+            for batch_data, index_data in batch_data_generator:  # 根据batch_size会影响到这里的循环次数
                 batch_feat_inst = batch_data
                 if not self.batch_generator.batch_masked:
                     index_data = None

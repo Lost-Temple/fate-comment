@@ -71,7 +71,7 @@ class HeteroLRHost(HeteroLRBase):
 
         self.header = self.get_header(data_instances)
         model_shape = self.get_features_shape(data_instances)  # 这里就是返回总共多少个特征列
-        self.cipher_operator = self.cipher.gen_paillier_cipher_operator(method=self.model_param.encrypt_param.method)
+        self.cipher_operator = self.cipher.gen_paillier_cipher_operator(method=self.model_param.encrypt_param.method)  # 这里会获取帕耶同态加密的公钥（由ARBITER产生并发送的）
 
         self.batch_generator.initialize_batch_generator(data_instances, shuffle=self.shuffle)
         if self.batch_generator.batch_masked:

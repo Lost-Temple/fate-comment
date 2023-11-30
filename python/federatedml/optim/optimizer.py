@@ -64,7 +64,7 @@ class _Optimizer(object):
             coef_ - gradient_without_intercept) - self.shrinkage_val)
 
         if model_weights.fit_intercept:  # 如果包含截距，将新的权重数组添加到
-            new_weights = np.append(new_weights, model_weights.intercept_)  # 把截距项添加到数
+            new_weights = np.append(new_weights, model_weights.intercept_)  # 把截距项添加到数组
             new_weights[-1] -= gradient[-1]  # 对截距的值进行调整
         new_param = LinearModelWeights(new_weights, model_weights.fit_intercept, model_weights.raise_overflow_error)
         # LOGGER.debug("In _l1_updator, original weight: {}, new_weights: {}".format(
@@ -226,7 +226,7 @@ class _RMSPropOptimizer(_Optimizer):
         learning_rate = self.decay_learning_rate()
 
         if self.opt_m is None:
-            self.opt_m = np.zeros_like(grad)
+            self.opt_m = np.zeros_like(grad)  # 给 self.opt_m 赋值，值 按grad的数据结构，把值置为0值
 
         self.opt_m = self.rho * self.opt_m + (1 - self.rho) * np.square(grad)
         self.opt_m = np.array(self.opt_m, dtype=np.float64)

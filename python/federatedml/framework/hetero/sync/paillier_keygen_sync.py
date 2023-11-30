@@ -33,8 +33,8 @@ class Arbiter(object):
 
         cipher.generate_key(key_length)
         pub_key = cipher.get_public_key()
-        self._pubkey_transfer.remote(obj=pub_key, role=consts.HOST, idx=-1, suffix=suffix)
-        self._pubkey_transfer.remote(obj=pub_key, role=consts.GUEST, idx=-1, suffix=suffix)
+        self._pubkey_transfer.remote(obj=pub_key, role=consts.HOST, idx=-1, suffix=suffix)  # 把公钥发给HOST
+        self._pubkey_transfer.remote(obj=pub_key, role=consts.GUEST, idx=-1, suffix=suffix)  # 把公钥发给GUEST
         return cipher
 
 
