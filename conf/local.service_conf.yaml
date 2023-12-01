@@ -89,6 +89,7 @@ fate_on_spark:
     # default use SPARK_HOME environment variable
     # 默认使用SPARK_HOME环境变量的值，如果没有设置这个环境变量，就使用home的配置。
     # 如果home也没有设置，那就使用pyspark包的路径作为SPARK_HOME
+    # SPARK_HOME下会有配置文件配置spark集群地址
     home:
     cores_per_node: 20
     nodes: 2

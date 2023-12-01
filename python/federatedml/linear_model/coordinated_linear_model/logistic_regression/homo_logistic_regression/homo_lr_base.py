@@ -108,13 +108,13 @@ class HomoLRBase(BaseLogisticRegression):
         else:  # HOST或GUEST都为客户端
             self._client_check_data(data_instances)
 
-        if len(classes) > 2:
+        if len(classes) > 2:  # 多分类
             self.need_one_vs_rest = True
             self.need_call_back_loss = False
             self.one_vs_rest_fit(train_data=data_instances, validate_data=validate_data)
             if self.header is None:
                 self.header = self.one_vs_rest_obj.header
-        else:
+        else:  # 二分类
             self.need_one_vs_rest = False
             self.fit_binary(data_instances, validate_data)
 
