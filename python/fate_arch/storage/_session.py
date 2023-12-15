@@ -134,7 +134,7 @@ class StorageSessionBase(StorageSessionABC):
         table_meta.count = table_count
         table_meta.write_access_time = current_timestamp()
         table_meta.origin = StorageTableOrigin.OUTPUT
-        table_meta.create()
+        table_meta.create()  # 这里会保存元数据，也就是组件输出的data的在存储引擎上的元数据
         return table_meta
 
     def __enter__(self):

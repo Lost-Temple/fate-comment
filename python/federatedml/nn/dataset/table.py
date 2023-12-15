@@ -95,25 +95,26 @@ class TableDataset(Dataset):
             header = data_inst.schema["header"]
             LOGGER.debug('input dtable header is {}'.format(header))
             data = list(data_inst.collect())
-            data_keys = [key for (key, val) in data]
+            data_keys = [key for (key, val) in data]  # 这里就是ID（字符串）的List
+            # 以ID字符串为KEY，以序号为值的字典,如果数据集中有重复ID，这里就会出问题
             data_keys_map = dict(zip(sorted(data_keys), range(len(data_keys))))
 
-            keys = [None for idx in range(len(data_keys))]
-            x_ = [None for idx in range(len(data_keys))]
-            y_ = [None for idx in range(len(data_keys))]
+            keys = [None for idx in range(len(data_keys))]  # 根据ID个数为长度，初始化一个数组，值初始化为None
+            x_ = [None for idx in range(len(data_keys))]  # 同上
+            y_ = [None for idx in range(len(data_keys))]  # 同上
             match_ids = {}
-            sample_weights = [1 for idx in range(len(data_keys))]
+            sample_weights = [1 for idx in range(len(data_keys))]  # 根据ID个数为长度，初始化数组，元素初始化为1
 
             for (key, inst) in data:
-                idx = data_keys_map[key]
-                keys[idx] = key
+                idx = data_keys_map[key]  # id字典中根据id获取它的序号
+                keys[idx] = key  # id的值
                 x_[idx] = inst.features
                 y_[idx] = inst.label
                 match_ids[key] = inst.inst_id
                 if self.with_sample_weight:
                     sample_weights[idx] = inst.weight
 
-            x_ = np.asarray(x_)
+            x_ = np.asarray(x_)  # x_ 是一个二维数组，每个元素是一个一维数组（特征值）,如果有id重复的情况下，x_中会有一些元素为None
             y_ = np.asarray(y_)
             df = pd.DataFrame(x_)
             df.columns = header

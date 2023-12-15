@@ -305,7 +305,7 @@ class Session(object):
     @classmethod
     def persistent(cls, computing_table: CTableABC, namespace, name, schema=None, part_of_data=None,
                    engine=None, engine_address=None, store_type=None, token: typing.Dict = None) -> StorageTableMetaABC:
-        return StorageSessionBase.persistent(computing_table=computing_table,
+        return StorageSessionBase.persistent(computing_table=computing_table,  # 把数据保存到存储引擎中，并在Mysql数据库中保存元数据
                                              namespace=namespace,
                                              name=name,
                                              schema=schema,

@@ -109,7 +109,7 @@ class StorageTableBase(StorageTableABC):
         table_meta.engine = self._engine
         table_meta.store_type = self._store_type
         table_meta.options = self._options
-        table_meta.create()
+        table_meta.create()  # 添加到数据库
         self._meta = table_meta
 
         return table_meta
@@ -126,9 +126,9 @@ class StorageTableBase(StorageTableABC):
         return self._collect(**kwargs)
 
     def count(self):
-        self._update_read_access_time()
+        self._update_read_access_time()  # 更新meta中的时间
         count = self._count()
-        self.meta.update_metas(count=count)
+        self.meta.update_metas(count=count)  # 更新meta中的时间
         return count
 
     def read(self):
@@ -233,7 +233,7 @@ class StorageTableMeta(StorageTableMetaABC):
             return False
 
     @DB.connection_context()
-    def create(self):
+    def create(self):  # 添加新记录到 t_storage_table_meta中
         table_meta = StorageTableMetaModel()
         table_meta.f_create_time = current_timestamp()
         table_meta.f_schema = {}
