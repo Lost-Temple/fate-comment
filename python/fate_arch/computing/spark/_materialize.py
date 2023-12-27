@@ -26,7 +26,7 @@ def materialize(rdd):
 
 
 def unmaterialize(rdd):
-    rdd.unpersist()
+    rdd.unpersist()  # 会释放持久化所占用的内存和磁盘空间
 
 
 # noinspection PyUnresolvedReferences

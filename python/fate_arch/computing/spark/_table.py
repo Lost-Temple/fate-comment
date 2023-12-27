@@ -48,7 +48,7 @@ class Table(CTableABC):
 
     def __del__(self):
         try:
-            unmaterialize(self._rdd)
+            unmaterialize(self._rdd)  # 在Table 对象销毁的时候进行rdd的反持久化，把持久化所占的资源进行释放
             del self._rdd
         except BaseException:
             return
