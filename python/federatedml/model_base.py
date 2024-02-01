@@ -119,9 +119,9 @@ class CallbacksVariable(object):
         self.validation_summary = None
 
 
-class WarpedTrackerClient:
+class WarpedTrackerClient:  # 包装了几个方法，最终还是调用 TrackerClient 去实现功能
     def __init__(self, tracker) -> None:
-        self._tracker = tracker
+        self._tracker = tracker  # 这里的 _tracker 是 TrackerClient 对象
 
     def log_metric_data(
         self, metric_namespace: str, metric_name: str, metrics: typing.List[Metric]
