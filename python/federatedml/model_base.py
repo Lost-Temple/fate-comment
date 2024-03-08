@@ -227,17 +227,17 @@ class ModelBase(object):
         deserialize_models(cpn_input.models)
 
         # retry
-        if (
+        if (  # 是否满足retry的条件
             retry
             and hasattr(self, '_retry')
             and callable(self._retry)
             and self.checkpoint_manager is not None
             and self.checkpoint_manager.latest_checkpoint is not None
         ):
-            self._retry(cpn_input=cpn_input)
+            self._retry(cpn_input=cpn_input)  # 重试执行
         # normal
         else:
-            self._run(cpn_input=cpn_input)
+            self._run(cpn_input=cpn_input)  # 正常执行
 
         return ComponentOutput(self.save_data(), self._export(), self.save_cache())
 
@@ -296,9 +296,9 @@ class ModelBase(object):
         self._init_model(self.model_param)
 
         self.callback_list = CallbackList(self.role, self.mode, self)
-        if hasattr(self.model_param, "callback_param"):
+        if hasattr(self.model_param, "callback_param"):  # 如果有callback_param
             callback_param = getattr(self.model_param, "callback_param")
-            self.callback_list.init_callback_list(callback_param)
+            self.callback_list.init_callback_list(callback_param)  # 初始化callback_list
         # 获取running_funcs，包含：todo_func_list = []、todo_func_params = []、save_result = []、use_previews_result = []
         running_funcs = self.component_properties.extract_running_rules(
             datasets=cpn_input.datasets, models=cpn_input.models, cpn=self
@@ -359,9 +359,9 @@ class ModelBase(object):
         )
 
         running_funcs = RunningFuncs()
-        latest_checkpoint = self.get_latest_checkpoint()
+        latest_checkpoint = self.get_latest_checkpoint()  # 获取最近的一个checkpoint
         running_funcs.add_func(self.load_model, [latest_checkpoint])
-        running_funcs = self.component_properties.warm_start_process(
+        running_funcs = self.component_properties.warm_start_process(  # 热启动，从最近的一个checkpoint的开启执行
             running_funcs, self, train_data, validate_data
         )
         LOGGER.debug(f"running_funcs: {running_funcs.todo_func_list}")

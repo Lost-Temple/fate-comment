@@ -64,7 +64,7 @@ class ComponentProperties(object):
         self.has_validate_data = False  # 是否有验证集，验证集用于调整模型的超参数
         self.has_test_data = False  # 是否有测试集，测试集用于评估模型性能
         self.has_normal_input_data = False
-        self.role = None
+        self.role = None  # 本地组织角色
         self.host_party_idlist = []  # host方的 party id 列表
         self.local_partyid = -1  # 本地 party id
         self.guest_partyid = -1  # guest 方的party id
@@ -72,12 +72,12 @@ class ComponentProperties(object):
         self.input_eval_data_count = 0  # 评估数据集中的数据量
         self.caches = None  # 组件的输出可以缓存，当下一个组件需要相同的输出时，它可以从缓存中获取数据而不是重新计算
         self.is_warm_start = False  # 是否使用热启动
-        self.has_arbiter = False
+        self.has_arbiter = False  # 是否有arbiter
 
     def parse_caches(self, caches):
         self.caches = caches
 
-    def parse_component_param(self, roles, param):
+    def parse_component_param(self, roles, param):  # 解析组件参数
 
         try:
             need_cv = param.cv_param.need_cv
@@ -106,7 +106,7 @@ class ComponentProperties(object):
             self.guest_partyid = self.guest_partyid[0]
         return self
 
-    def parse_dsl_args(self, datasets, model):
+    def parse_dsl_args(self, datasets, model):  # 解析DSL参数
         if "model" in model and model["model"] is not None:
             self.has_model = True
         if "isometric_model" in model and model["isometric_model"] is not None:
