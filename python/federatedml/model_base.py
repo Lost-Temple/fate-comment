@@ -52,7 +52,7 @@ def serialize_models(models):
     return serialized_models
 
 
-class ComponentOutput:
+class ComponentOutput:  # 组件输出类
     def __init__(self, data, models, cache: typing.List[tuple]) -> None:
         self._data = data
         if not isinstance(self._data, list):
@@ -239,16 +239,16 @@ class ModelBase(object):
         else:
             self._run(cpn_input=cpn_input)  # 正常执行
 
-        return ComponentOutput(self.save_data(), self._export(), self.save_cache())
+        return ComponentOutput(self.save_data(), self._export(), self.save_cache())  # 返回组件输出对象
 
     def _export(self):
         # export model
         try:
-            model = self._export_model()
+            model = self._export_model()  # 这个目前好像没发现哪个子类里面实现了，基类里面也没实现
             meta = self._export_meta()
             export_dict = {"Meta": meta, "Param": model}
-        except NotImplementedError:
-            export_dict = self.export_model()
+        except NotImplementedError:  # 所以这个异常会被触发
+            export_dict = self.export_model()  # 这在有些子类里面是实现了的
 
             # export nothing, return
             if export_dict is None:
